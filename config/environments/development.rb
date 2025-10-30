@@ -12,6 +12,9 @@ Rails.application.configure do
   # Show full error reports.
   config.consider_all_requests_local = true
 
+  # Allow the app to be framed in development.
+  config.action_dispatch.default_headers.delete('X-Frame-Options')
+  
   # Enable server timing.
   config.server_timing = true
 
