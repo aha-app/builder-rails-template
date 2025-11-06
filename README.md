@@ -1,24 +1,24 @@
-# README
+# Builder Rails Template
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+A Rails 8 application template with Hotwire (Turbo + Stimulus) and Tailwind CSS 4.
 
-Things you may want to cover:
+## Quick Start
 
-* Ruby version
+```bash
+bin/setup
+bin/dev
+```
 
-* System dependencies
+## Running Tests
 
-* Configuration
+```bash
+bin/rails test
+```
 
-* Database creation
+## Documentation
 
-* Database initialization
+See [CLAUDE.md](CLAUDE.md) for complete documentation on the stack, architecture, and development patterns.
 
-* How to run the test suite
+## Fred codes
 
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+The application is auto booted with the app.sh script and kept running in the background.
