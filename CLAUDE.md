@@ -42,15 +42,6 @@ Turbo Morph provides intelligent page updates by morphing the DOM rather than re
 - **Solid Queue** - Database-backed Active Job adapter
 - **Solid Cable** - Database-backed Action Cable adapter
 
-### Multi-Database Architecture
-
-This application uses a multi-database setup:
-
-- Primary database (application data)
-- Cache database (Solid Cache)
-- Queue database (Solid Queue)
-- Cable database (Solid Cable)
-
 ## JavaScript Structure
 
 - **Entry point**: `app/javascript/application.js`
