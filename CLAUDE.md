@@ -1,6 +1,6 @@
 # Builder Application
 
-This is a Rails 8 application template using modern Hotwire technologies.
+This is a Rails 8 application template using modern Hotwire technologies. It is a greenfield Rails app using Minitest with no existing models/controllers to reference.
 
 ## Stack Overview
 
