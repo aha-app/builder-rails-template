@@ -19,6 +19,7 @@ This is a Rails 8 application template using Inertia.js with React. It is a gree
 - **Vite** - Fast build tool and development server
 - **shadcn/ui** - High-quality, accessible UI components built on Radix UI
 - **Tailwind CSS v4** - Utility-first CSS framework
+- **JS-Routes** - Auto-generated JavaScript routes from Rails routes `import { rootPath } from "@/routes"`
 
 ### Infrastructure
 

@@ -44,6 +44,9 @@ node_modules
 # https://vitejs.dev/guide/env-and-mode.html#env-files
 *.local
 
+/app/frontend/routes/index.js
+/app/frontend/routes/index.d.ts
+
 # Bundled gems installed to vendor
 /vendor/bundle/
 /vendor/bin/
