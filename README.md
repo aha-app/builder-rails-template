@@ -1,6 +1,6 @@
 # Builder Rails Template
 
-A Rails 8 application template with Hotwire (Turbo + Stimulus) and Tailwind CSS 4.
+A Rails 8 application template
 
 ## Quick Start
 

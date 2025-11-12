@@ -47,4 +47,3 @@ node_modules
 # Bundled gems installed to vendor
 /vendor/bundle/
 /vendor/bin/
-

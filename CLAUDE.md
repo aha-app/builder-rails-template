@@ -1,6 +1,6 @@
 # Builder Application
 
-This is a Rails 8 application template using modern Hotwire technologies. It is a greenfield Rails app using Minitest with no existing models/controllers to reference.
+This is a Rails 8 application template using Inertia.js with React. It is a greenfield Rails app using Minitest with no existing models/controllers to reference.
 
 ## Stack Overview
 
@@ -9,32 +9,16 @@ This is a Rails 8 application template using modern Hotwire technologies. It is 
 - **Rails 8.0.2** - Modern Ruby on Rails framework
 - **PostgreSQL** - Primary database
 - **Puma** - Web server
+- **Inertia Rails** - Server-side adapter for Inertia.js (`config/initializers/inertia_rails.rb`)
 
 ### Frontend
 
-- **Turbo** (via turbo-rails) - Hotwire's SPA-like page accelerator
-- **Stimulus** (via stimulus-rails) - Hotwire's modest JavaScript framework
-- **Importmap** - ES modules without bundling
-- **Tailwind CSS 4.x** - Utility-first CSS framework
-- **Propshaft** - Modern asset pipeline
-
-### Turbo Configuration
-
-This application is configured to use **Turbo Morph** for page refreshes:
-
-```html
-<meta name="turbo-refresh-method" content="morph" />
-<meta name="turbo-refresh-scroll" content="preserve" />
-```
-
-Located in `app/views/layouts/application.html.erb:26-28`
-
-Turbo Morph provides intelligent page updates by morphing the DOM rather than replacing it entirely, which preserves:
-
-- Form state
-- Scroll positions
-- Focus states
-- Third-party widget state
+- **Inertia.js** - Modern monolith approach that bridges Rails and React
+- **React 19** - UI library for building component-based interfaces
+- **TypeScript** - Type-safe JavaScript development
+- **Vite** - Fast build tool and development server
+- **shadcn/ui** - High-quality, accessible UI components built on Radix UI
+- **Tailwind CSS v4** - Utility-first CSS framework
 
 ### Infrastructure
 
@@ -42,14 +26,34 @@ Turbo Morph provides intelligent page updates by morphing the DOM rather than re
 - **Solid Queue** - Database-backed Active Job adapter
 - **Solid Cable** - Database-backed Action Cable adapter
 
-## JavaScript Structure
+## Frontend Structure
 
-- **Entry point**: `app/javascript/application.js`
-- **Controllers**: `app/javascript/controllers/`
-- **Import maps**: `config/importmap.rb`
+### Directory Layout
 
-The application uses Stimulus controllers for interactive behavior, with Turbo handling navigation and updates.
+- **Entry point**: `app/frontend/entrypoints/inertia.ts`
+- **Styles**: `app/frontend/entrypoints/application.css`
+- **Components**: `app/frontend/components/` (shadcn/ui components)
+- **Utilities**: `app/frontend/lib/utils.ts`
+- **Types**: `app/frontend/types/`
+
+### Configuration Files
+
+- **Vite**: `vite.config.ts` - Build configuration with React plugin and React Compiler
+- **TypeScript**: `tsconfig.json`, `tsconfig.app.json`, `tsconfig.node.json`
+- **shadcn/ui**: `components.json` - UI component configuration (New York style)
+
+### Development Tools
+
+- **ESLint** - Code linting with React and TypeScript support
+- **Prettier** - Code formatting with Tailwind plugin
 
 ## Styling
 
-Tailwind CSS is configured with the Ruby standalone build, providing modern utility-first styling without Node.js dependencies.
+Tailwind CSS v4 is configured through the Vite plugin (`@tailwindcss/vite`), providing:
+
+- Modern utility-first styling
+- CSS variables for theming
+- Forms and typography plugins
+- Integration with shadcn/ui components
+
+The main stylesheet is located at `app/frontend/entrypoints/application.css`.
