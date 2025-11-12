@@ -12,12 +12,9 @@ gem "solid_queue"
 gem "solid_cable"
 gem "bootsnap", require: false
 gem "image_processing", "~> 1.2"
-gem "tailwindcss-ruby", "~> 4.1"
-gem "tailwindcss-rails", "~> 4.4"
 gem "inertia_rails", "~> 3.12"
 gem "vite_rails", "~> 3.0"
 gem "js-routes"
-
 
 group :development, :test do
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
@@ -34,5 +31,3 @@ end
 group :test do
   gem "sqlite3", ">= 2.1"
 end
-
-
