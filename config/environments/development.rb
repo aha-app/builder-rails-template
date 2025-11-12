@@ -18,6 +18,9 @@ Rails.application.configure do
   # Enable server timing.
   config.server_timing = true
 
+  # Disable origin check in development to avoid HTTP/HTTPS mismatch issues
+  config.action_controller.forgery_protection_origin_check = false
+
   config.hosts << ".ahalocalhost.com"
   config.hosts << /fredcodes-local-[a-z0-9]+/
 
