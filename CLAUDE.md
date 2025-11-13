@@ -9,7 +9,7 @@ This is a Rails 8 application template using Inertia.js with React. It is a gree
 - **Rails 8.0.2** - Modern Ruby on Rails framework
 - **PostgreSQL** - Primary database
 - **Puma** - Web server
-- **Inertia Rails** - Server-side adapter for Inertia.js (`config/initializers/inertia_rails.rb`)
+- **Inertia Rails** - Inertia.js adapter for Rails
 
 ### Frontend
 
@@ -41,7 +41,7 @@ This is a Rails 8 application template using Inertia.js with React. It is a gree
 
 - **Vite**: `vite.config.ts` - Build configuration with React plugin and React Compiler
 - **TypeScript**: `tsconfig.json`, `tsconfig.app.json`, `tsconfig.node.json`
-- **shadcn/ui**: `components.json` - UI component configuration (New York style)
+- **shadcn/ui**: `components.json` - UI component configuration
 
 ### Development Tools
 
@@ -53,8 +53,35 @@ This is a Rails 8 application template using Inertia.js with React. It is a gree
 Tailwind CSS v4 is configured through the Vite plugin (`@tailwindcss/vite`), providing:
 
 - Modern utility-first styling
-- CSS variables for theming
-- Forms and typography plugins
-- Integration with shadcn/ui components
+- CSS variables for theming shadcn/ui components
 
 The main stylesheet is located at `app/frontend/entrypoints/application.css`.
+
+## Useful commands
+
+- ./bin/rails generate # Lists available Rails generators
+- ./bin/rails generate model # Generates a new Rails model with migrations and tests
+- ./bin/rails generate migration # Generates a new Rails migration
+- ./bin/rails generate authentication # Generates a full authentication system with user models and sessions
+- ./bin/rails test # Runs the Rails test suite
+- ./bin/rails js:routes # Generates TypeScript definitions for Rails routes
+- bundle exec rubocop # Runs Ruby linter
+- npm type-check # Runs TypeScript type checks
+- npm lint:fix # Runs JavaScript/TypeScript linter
+- npm format:fix # Prettier code formatter
+
+## Preferences
+
+- Prefer inertia's <Form> over `useForm`
+
+  ```tsx
+  import { Form } from '@inertiajs/react';
+
+  export default () => (
+  	<Form action="/users" method="post">
+  		<input type="text" name="name" />
+  		<input type="email" name="email" />
+  		<button type="submit">Create User</button>
+  	</Form>
+  );
+  ```
