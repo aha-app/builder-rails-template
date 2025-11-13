@@ -14,6 +14,15 @@
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
 
+    <script>
+      <%# Enable dark mode based on localStorage or system preference. Inline to avoid FOUC. %>
+      document.documentElement.classList.toggle(
+        "dark",
+        localStorage.appearance === "dark" ||
+          (!("appearance" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches),
+      );
+    </script>
+
     <script src="https://secure.ahalocalhost.com:3000/assets/builder/shim.js"></script>
     <%= vite_stylesheet_tag "application" %>
     <%= vite_typescript_tag "inertia" %>
