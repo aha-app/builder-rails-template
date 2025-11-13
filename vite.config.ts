@@ -15,4 +15,7 @@ export default defineConfig({
 		ViteRuby(),
 		EnvironmentPlugin({ RAILS_ENV: 'development' }),
 	],
+	server: {
+		hmr: false,
+	},
 });
