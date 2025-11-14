@@ -85,3 +85,10 @@ The main stylesheet is located at `app/frontend/entrypoints/application.css`.
   	</Form>
   );
   ```
+
+- New Rails controllers should inherit from `InertiaController`
+
+  ```ruby
+  class UsersController < InertiaController
+  end
+  ```
