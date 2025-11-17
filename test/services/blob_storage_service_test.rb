@@ -2,7 +2,7 @@
 
 require "test_helper"
 
-class BlobServiceStorageTest < ActiveSupport::TestCase
+class BlobStorageServiceTest < ActiveSupport::TestCase
   setup do
     @blob_service_url = "http://blob-service.test:9003"
 
@@ -14,7 +14,7 @@ class BlobServiceStorageTest < ActiveSupport::TestCase
     }
     @token = JWT.encode(@token_payload, nil, 'none')
 
-    @service = BlobServiceStorage.new(
+    @service = BlobStorageService.new(
       blob_service_url: @blob_service_url,
       token: @token
     )
@@ -32,7 +32,7 @@ class BlobServiceStorageTest < ActiveSupport::TestCase
 
   test "raises error with invalid token" do
     error = assert_raises(ActiveStorage::Error) do
-      BlobServiceStorage.new(
+      BlobStorageService.new(
         blob_service_url: @blob_service_url,
         token: "invalid-token"
       )
@@ -101,7 +101,7 @@ class BlobServiceStorageTest < ActiveSupport::TestCase
     }
     string_token = JWT.encode(string_payload, nil, 'none')
 
-    service = BlobServiceStorage.new(
+    service = BlobStorageService.new(
       blob_service_url: @blob_service_url,
       token: string_token
     )

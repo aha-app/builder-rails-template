@@ -30,7 +30,7 @@ This is a Rails 8 application template using Inertia.js with React. It is a gree
 ### File Storage
 
 - **ActiveStorage** with custom blob service using nginx x-accel-redirect
-- Service: [app/services/blob_service_storage.rb](app/services/blob_service_storage.rb)
+- Service: [app/services/blob_storage_service.rb](app/services/blob_storage_service.rb)
 - Config: [config/storage.yml](config/storage.yml)
 - Env vars: `BLOB_UPLOADS_RW` (required), `BLOB_SERVICE_URL` (optional)
 
@@ -100,7 +100,7 @@ upload.create((error, blob) => {
 
 ### Implementation
 
-- **Service**: [BlobServiceStorage](app/services/blob_service_storage.rb) - Net::HTTP, JWT tokens
+- **Service**: [BlobStorageService](app/services/blob_storage_service.rb) - Net::HTTP, JWT tokens
 - **Initializer**: [config/initializers/active_storage.rb](config/initializers/active_storage.rb) - Extends ActiveStorage controllers
 - **Routes**: Standard ActiveStorage routes (`/rails/active_storage/*`)
 

@@ -8,9 +8,9 @@ Rails.application.config.after_initialize do
     def update
       blob = ActiveStorage::Blob.find_signed!(params[:signed_id])
 
-      # Only use x-accel-redirect for BlobServiceStorage
+      # Only use x-accel-redirect for BlobStorageService
       service = ActiveStorage::Blob.service
-      if service.is_a?(BlobServiceStorage) && ENV['BLOB_UPLOADS_RW']
+      if service.is_a?(BlobStorageService) && ENV['BLOB_UPLOADS_RW']
         # Construct the blob service upload URL
         upload_url = service.blob_service_upload_url(blob.key)
 
@@ -36,9 +36,9 @@ Rails.application.config.after_initialize do
     def show
       blob = ActiveStorage::Blob.find_signed!(params[:signed_id])
 
-      # Only use x-accel-redirect for BlobServiceStorage
+      # Only use x-accel-redirect for BlobStorageService
       service = ActiveStorage::Blob.service
-      if service.is_a?(BlobServiceStorage) && ENV['BLOB_UPLOADS_RW']
+      if service.is_a?(BlobStorageService) && ENV['BLOB_UPLOADS_RW']
         # Get the nginx internal redirect path
         internal_path = service.nginx_redirect_path(blob.key)
 
@@ -52,8 +52,9 @@ Rails.application.config.after_initialize do
 
         head :ok
       else
-        # Fall back to standard behavior for other services
-        super
+        # Fall back to standard behavior - redirect to service URL
+        expires_in ActiveStorage.service_urls_expire_in
+        redirect_to blob.url(disposition: params[:disposition]), allow_other_host: true
       end
     end
 

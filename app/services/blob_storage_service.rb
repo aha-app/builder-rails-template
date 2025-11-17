@@ -16,7 +16,7 @@ require "uri"
 #     service: BlobService
 #     blob_service_url: http://blob-service.fredcodes-local.svc.cluster.local:9003
 #     token: <%= ENV['BLOB_UPLOADS_RW'] %>
-class BlobServiceStorage < ActiveStorage::Service
+class BlobStorageService < ActiveStorage::Service
   attr_reader :blob_service_url, :token, :account_id, :blob_store_id
 
   def initialize(blob_service_url:, token:)
