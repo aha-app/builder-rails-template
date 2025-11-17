@@ -27,6 +27,13 @@ This is a Rails 8 application template using Inertia.js with React. It is a gree
 - **Solid Queue** - Database-backed Active Job adapter
 - **Solid Cable** - Database-backed Action Cable adapter
 
+### File Storage
+
+- **ActiveStorage** with custom blob service using nginx x-accel-redirect
+- Service: [app/services/blob_service_storage.rb](app/services/blob_service_storage.rb)
+- Config: [config/storage.yml](config/storage.yml)
+- Env vars: `BLOB_UPLOADS_RW` (required), `BLOB_SERVICE_URL` (optional)
+
 ## Frontend Structure
 
 ### Directory Layout
@@ -56,6 +63,53 @@ Tailwind CSS v4 is configured through the Vite plugin (`@tailwindcss/vite`), pro
 - CSS variables for theming shadcn/ui components
 
 The main stylesheet is located at `app/frontend/entrypoints/application.css`.
+
+## File Storage
+
+Uses ActiveStorage with custom blob service and nginx x-accel-redirect for efficient streaming.
+
+### Usage
+
+```ruby
+class Document < ApplicationRecord
+  has_one_attached :file
+  has_many_attached :attachments
+end
+
+# Server-side attachment
+document.file.attach(io: File.open("file.pdf"), filename: "file.pdf")
+document.file.url  # Returns signed URL
+```
+
+### Direct Uploads
+
+For Inertia/React apps, use the `@rails/activestorage` package:
+
+```typescript
+import { DirectUpload } from '@rails/activestorage';
+
+const upload = new DirectUpload(file, '/rails/active_storage/direct_uploads');
+upload.create((error, blob) => {
+  if (error) {
+    // Handle error
+  } else {
+    // Use blob.signed_id in your form submission
+  }
+});
+```
+
+### Implementation
+
+- **Service**: [BlobServiceStorage](app/services/blob_service_storage.rb) - Net::HTTP, JWT tokens
+- **Initializer**: [config/initializers/active_storage.rb](config/initializers/active_storage.rb) - Extends ActiveStorage controllers
+- **Routes**: Standard ActiveStorage routes (`/rails/active_storage/*`)
+
+### nginx Config
+
+```nginx
+location /_blob_upload { internal; }
+location ~ ^/_blob_internal/... { internal; }
+```
 
 ## Useful commands
 

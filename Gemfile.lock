@@ -136,6 +136,8 @@ GEM
       railties (>= 5)
       sorbet-runtime
     json (2.15.1)
+    jwt (3.1.2)
+      base64
     language_server-protocol (3.17.0.5)
     lint_roller (1.1.0)
     logger (1.7.0)
@@ -368,6 +370,7 @@ DEPENDENCIES
   inertia_rails (~> 3.12)
   jbuilder
   js-routes
+  jwt
   pg (~> 1.1)
   propshaft
   puma (>= 5.0)

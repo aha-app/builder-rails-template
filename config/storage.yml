@@ -6,6 +6,12 @@ local:
   service: Disk
   root: <%= Rails.root.join("storage") %>
 
+# Blob service storage using x-accel-redirect pattern
+blob_service:
+  service: BlobService
+  blob_service_url: <%= ENV.fetch('BLOB_SERVICE_URL', 'http://blob-service.fredcodes-local.svc.cluster.local:9003') %>
+  token: <%= ENV['BLOB_UPLOADS_RW'] %>
+
 # Use bin/rails credentials:edit to set the AWS secrets (as aws:access_key_id|secret_access_key)
 # amazon:
 #   service: S3
