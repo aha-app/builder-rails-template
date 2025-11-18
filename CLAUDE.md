@@ -72,19 +72,57 @@ The main stylesheet is located at `app/frontend/entrypoints/application.css`.
 
 ## Preferences
 
-- Prefer inertia's <Form> over `useForm`
+- **Prefer `<Form>` over `useForm`** - The `<Form>` component handles 90% of cases and should be your default choice.
+
+  **Use uncontrolled inputs:**
+  - Use `name` attribute (not `value` + `onChange`)
+  - Use `defaultValue` for initial values (not `value`)
+  - Let the browser handle form state naturally
+  - Automatically handles nested data (`report[description]`), arrays (`tags[]`), and dotted notation (`user.name`)
+  - Supports file uploads out of the box
+
+  **Reset forms after submission:**
+  - Use `resetOnSuccess` prop to clear form after successful submission
+  - Use `resetOnError` if you need to reset after validation errors
+  - Don't use React `key` prop or other workarounds to force remounts
+
+  **Access reactive state via slot props:**
+  - `errors`, `processing`, `isDirty`, `wasSuccessful`, etc.
 
   ```tsx
   import { Form } from '@inertiajs/react';
 
+  // ✅ CORRECT: Uncontrolled form with resetOnSuccess
   export default () => (
-  	<Form action="/users" method="post">
-  		<input type="text" name="name" />
-  		<input type="email" name="email" />
-  		<button type="submit">Create User</button>
+  	<Form action="/users" method="post" resetOnSuccess>
+  		{({ errors, processing }) => (
+  			<>
+  				<input type="text" name="name" defaultValue="John" />
+  				{errors.name && <div>{errors.name}</div>}
+
+  				<input type="text" name="user.skills[]" />
+  				<input type="file" name="avatar" />
+
+  				<button type="submit" disabled={processing}>
+  					{processing ? 'Submitting...' : 'Submit'}
+  				</button>
+  			</>
+  		)}
   	</Form>
   );
+
+  // ❌ WRONG: Controlled inputs with useState
+  const [name, setName] = useState('');
+  <Form action="/users" method="post">
+  	<input value={name} onChange={(e) => setName(e.target.value)} />
+  </Form>;
   ```
+
+  **When to use `useForm` instead:**
+  - You need programmatic control over form state
+  - Implementing real-time validation
+  - Fields have complex interdependencies
+  - You need to track `isDirty`, `processing`, etc. in your component logic
 
 - New Rails controllers should inherit from `InertiaController`
 
