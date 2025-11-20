@@ -1,13 +1,14 @@
 #!/bin/bash
 set -e
 
-# One-time setup
-bundle install
-bin/rails db:migrate
+echo "Starting processes (Rails, Vite)"
 
-echo "Starting processes (Rails, Tailwind)"
+# Start Vite dev server in the background
+bin/vite dev &
+VITE_PID=$!
 
-# Set environment variable and run Rails in foreground
-# Tailwind starts as a plugin in Puma
-export TAILWIND_WATCH_ARG="poll"
+# Trap to kill background processes on exit
+trap "kill $VITE_PID 2>/dev/null" EXIT
+
+# Start Rails in foreground
 exec bin/rails s -p 8080
