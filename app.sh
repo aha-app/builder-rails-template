@@ -1,6 +1,11 @@
 #!/bin/bash
 set -e
 
+# Ensure configuration is up to date
+bundle install
+npm install
+bin/rails db:migrate
+
 echo "Starting processes (Rails, Vite)"
 
 # Start Vite dev server in the background
