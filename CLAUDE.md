@@ -2,60 +2,22 @@
 
 This is a Rails 8 application template using Inertia.js with React. It is a greenfield Rails app using Minitest with no existing models/controllers to reference.
 
-## Stack Overview
+## Stack
 
-### Backend
-
-- **Rails 8.0.2** - Modern Ruby on Rails framework
-- **PostgreSQL** - Primary database
-- **Puma** - Web server
-- **Inertia Rails** - Inertia.js adapter for Rails
-
-### Frontend
-
-- **Inertia.js** - Modern monolith approach that bridges Rails and React
-- **React 19** - UI library for building component-based interfaces
-- **TypeScript** - Type-safe JavaScript development
-- **Vite** - Fast build tool and development server
-- **shadcn/ui** - High-quality, accessible UI components built on Radix UI
-- **Tailwind CSS v4** - Utility-first CSS framework
-- **JS-Routes** - Auto-generated JavaScript routes from Rails routes `import { rootPath } from "@/routes"`
-
-### Infrastructure
-
-- **Solid Cache** - Database-backed cache store
-- **Solid Queue** - Database-backed Active Job adapter
-- **Solid Cable** - Database-backed Action Cable adapter
+Rails 8.1 + Inertia.js + React 19 + TypeScript + Vite. Uses shadcn/ui components, Tailwind CSS v4, and JS-Routes for type-safe routing (`import { rootPath } from "@/routes"`). Database-backed infrastructure: Solid Cache/Queue/Cable.
 
 ## Frontend Structure
 
-### Directory Layout
-
-- **Entry point**: `app/frontend/entrypoints/inertia.ts`
+- **Entry**: `app/frontend/entrypoints/inertia.ts`
 - **Styles**: `app/frontend/entrypoints/application.css`
+- **Pages**: `app/frontend/pages/` (Inertia page components)
 - **Components**: `app/frontend/components/` (shadcn/ui components)
-- **Utilities**: `app/frontend/lib/utils.ts`
+- **Utils**: `app/frontend/lib/utils.ts`
 - **Types**: `app/frontend/types/`
-
-### Configuration Files
-
-- **Vite**: `vite.config.ts` - Build configuration with React plugin and React Compiler
-- **TypeScript**: `tsconfig.json`, `tsconfig.app.json`, `tsconfig.node.json`
-- **shadcn/ui**: `components.json` - UI component configuration
-
-### Development Tools
-
-- **ESLint** - Code linting with React and TypeScript support
-- **Prettier** - Code formatting with Tailwind plugin
 
 ## Styling
 
-Tailwind CSS v4 is configured through the Vite plugin (`@tailwindcss/vite`), providing:
-
-- Modern utility-first styling
-- CSS variables for theming shadcn/ui components
-
-The main stylesheet is located at `app/frontend/entrypoints/application.css`.
+Tailwind CSS v4 via Vite plugin. Stylesheet: `app/frontend/entrypoints/application.css`
 
 ## Useful commands
 
@@ -64,11 +26,151 @@ The main stylesheet is located at `app/frontend/entrypoints/application.css`.
 - ./bin/rails generate migration # Generates a new Rails migration
 - ./bin/rails generate authentication # Generates a full authentication system with user models and sessions
 - ./bin/rails test # Runs the Rails test suite
+- ./bin/ci # Runs Rails tests, Rubocop, JS/TS lint, and TypeScript type checks. All in one command.
 - ./bin/rails js:routes # Generates TypeScript definitions for Rails routes
 - bundle exec rubocop # Runs Ruby linter
 - npm type-check # Runs TypeScript type checks
 - npm lint:fix # Runs JavaScript/TypeScript linter
 - npm format:fix # Prettier code formatter
+
+## Inertia.js Patterns & Gotchas
+
+### Navigation: Link vs router.visit
+
+- **Prefer `<Link>` for navigation** - Use the `Link` component for standard navigation (anchor tags)
+- **Use `router.visit()` for programmatic navigation** - After form submissions, in callbacks, or conditional redirects
+
+```tsx
+import { Link, router } from '@inertiajs/react';
+
+// ✅ CORRECT: Link for navigation
+<Link href="/users">Users</Link>
+
+// ✅ CORRECT: router.visit for programmatic navigation
+const handleAction = () => {
+  router.visit('/dashboard');
+};
+```
+
+### Backend: Shared data with inertia_share
+
+Use `inertia_share` in `InertiaController` to automatically include data in every Inertia response:
+
+```ruby
+# app/controllers/inertia_controller.rb (already configured with flash)
+class InertiaController < ApplicationController
+  inertia_config default_render: true
+  inertia_share flash: -> { flash.to_hash }
+
+  # Add more shared data as needed:
+  inertia_share do
+    {
+      auth: {
+        user: current_user&.as_json(only: %i[id email name])
+      }
+    }
+  end
+end
+```
+
+**CSRF tokens are handled automatically** - No configuration needed. Inertia's Rails adapter includes the proper CSRF token in all requests.
+
+### Backend: Error handling in production
+
+Use `rescue_from` in `ApplicationController` to return proper Inertia error pages instead of allowing modal error displays:
+
+```ruby
+class ApplicationController < ActionController::Base
+  rescue_from StandardError do |exception|
+    render inertia: 'Error', props: {
+      status: 500,
+      message: exception.message
+    }, status: 500
+  end
+end
+```
+
+### Authorization through props
+
+**Always pass authorization checks as props** - Don't rely on server-side helpers in React components:
+
+```ruby
+# ✅ CORRECT: Pass authorization in props
+def show
+  @post = Post.find(params[:id])
+  render inertia: 'Posts/Show', props: {
+    post: @post.as_json,
+    can_edit: policy(@post).update?,
+    can_delete: policy(@post).destroy?
+  }
+end
+```
+
+```tsx
+// In React component
+const PostShow = ({ post, can_edit, can_delete }) => (
+  <>
+    {can_edit && <Button>Edit</Button>}
+    {can_delete && <Button>Delete</Button>}
+  </>
+);
+```
+
+### File uploads with PUT/PATCH
+
+**Important:** When using file uploads with `PUT` or `PATCH`, use method spoofing since multipart requests don't support these methods natively:
+
+```tsx
+// ✅ CORRECT: Method spoofing for file upload with PUT
+<Form action="/users/1" method="post">
+  <input type="hidden" name="_method" value="put" />
+  <input type="file" name="avatar" />
+  <button type="submit">Upload</button>
+</Form>
+```
+
+### Performance: Deferred props
+
+Use deferred props to load non-critical data after initial page render:
+
+```ruby
+# Controller
+def show
+  render inertia: 'Dashboard', props: {
+    user: current_user.as_json,
+    stats: InertiaRails.defer { expensive_stats_calculation }
+  }
+end
+```
+
+Frontend receives stats after initial render. Group related deferred props with `group: 'analytics'` for parallel fetching.
+
+### Performance: Lazy loading components
+
+For large apps, remove `{ eager: true }` from component resolution to enable code splitting:
+
+```ts
+// app/frontend/entrypoints/inertia.ts
+import.meta.glob('../pages/**/*.tsx'); // Lazy loads by default
+```
+
+Small apps benefit from single bundles (keep `eager: true`).
+
+### Form history state preservation
+
+If you need form state to persist across browser history navigation, provide a unique form key:
+
+```tsx
+// ✅ With form key - state persists in history
+const form = useForm('CreateUser', { name: '', email: '' });
+
+// ❌ Without key - state is lost on navigation
+const form = useForm({ name: '', email: '' });
+```
+
+### Progress events (file uploads only)
+
+Progress tracking only works during file uploads. Regular form submissions don't expose progress events.
 
 ## Preferences
 
@@ -130,3 +232,86 @@ The main stylesheet is located at `app/frontend/entrypoints/application.css`.
   class UsersController < InertiaController
   end
   ```
+
+### Component patterns: Empty state
+
+Use `Empty` component slots (no direct `title`/`description` props):
+
+```tsx
+<Empty>
+	<EmptyHeader>
+		<EmptyTitle>Title</EmptyTitle>
+		<EmptyDescription>Description</EmptyDescription>
+	</EmptyHeader>
+	<EmptyContent>{/* actions */}</EmptyContent>
+</Empty>
+```
+
+Import from `@/components/ui/empty`
+
+## Standard CRUD Pattern
+
+Follow this pattern when implementing CRUD resources (boards, projects, tasks, etc.) unless explicitly requested otherwise.
+
+### Backend structure
+
+1. **Model + Migration**: Add model with validations, enforce constraints in DB where practical (`null: false`, etc.)
+2. **Routes**: Use `resources :items` (or set `root "items#index"` if applicable)
+3. **Controller**: Inherit from `InertiaController`, implement standard actions:
+
+```ruby
+class ItemsController < InertiaController
+  before_action :set_item, only: %i[show edit update destroy]
+
+  def index
+    # render inertia: "Items/Index" (automatic via default_render: true)
+    # props via @items or local variable passed to render
+  end
+
+  def create
+    @item = Item.new(item_params)
+    if @item.save
+      redirect_to items_path, notice: "Created successfully."
+    else
+      # Use inertia_errors() helper from InertiaController
+      render inertia: "Items/New", props: { item: @item }.merge(inertia_errors(@item))
+    end
+  end
+
+  # Similar pattern for update/destroy
+end
+```
+
+**Key points:**
+
+- Use `inertia_errors(model)` to format validation errors (returns `{ errors: { field: "message" } }`)
+- Flash messages (`:notice`, `:alert`) are automatically shared to frontend
+- `default_render: true` means explicit `render inertia:` is optional for simple cases
+
+### Frontend structure
+
+**Page organization:**
+
+- Pages under `app/frontend/pages/ResourceName/` (PascalCase directory)
+- Standard pages: `Index.tsx`, `Show.tsx`, `New.tsx`, `Edit.tsx`
+- Controller renders match directory: `render inertia: "Items/Index"`
+
+**Forms:** Follow existing `<Form>` preferences (uncontrolled inputs, `resetOnSuccess`, etc.)
+
+**Props serialization:**
+
+```ruby
+# Minimal - only send what the page needs
+items.as_json(only: %i[id name created_at])
+```
+
+### Testing
+
+- **Models**: `test/models/item_test.rb` - validate presence, length, associations
+- **Controllers**: `test/controllers/items_controller_test.rb` - test all CRUD actions (happy path + validation failures)
+
+### When to deviate
+
+- **Complex forms**: Use `useForm` if you need programmatic control, real-time validation, or field interdependencies
+- **Non-RESTful actions**: Add custom routes/actions when CRUD doesn't fit the domain model
+- **Custom layouts**: Override default `PersistentLayout` per-page if needed
