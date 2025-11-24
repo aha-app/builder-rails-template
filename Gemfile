@@ -21,6 +21,7 @@ group :development, :test do
   gem "brakeman", require: false
   gem "bundler-audit", require: false
   gem "rubocop-rails-omakase", require: false
+  gem "rspec-rails", "~> 7.1"
 end
 
 group :development do
