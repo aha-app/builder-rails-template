@@ -35,142 +35,55 @@ Tailwind CSS v4 via Vite plugin. Stylesheet: `app/frontend/entrypoints/applicati
 
 ## Inertia.js Patterns & Gotchas
 
-### Navigation: Link vs router.visit
+### Navigation
 
-- **Prefer `<Link>` for navigation** - Use the `Link` component for standard navigation (anchor tags)
-- **Use `router.visit()` for programmatic navigation** - After form submissions, in callbacks, or conditional redirects
+- Prefer `<Link href="/path">` for standard navigation
+- Use `router.visit('/path')` for programmatic navigation (callbacks, conditionals)
 
-```tsx
-import { Link, router } from '@inertiajs/react';
+### Shared data
 
-// ✅ CORRECT: Link for navigation
-<Link href="/users">Users</Link>
-
-// ✅ CORRECT: router.visit for programmatic navigation
-const handleAction = () => {
-  router.visit('/dashboard');
-};
-```
-
-### Backend: Shared data with inertia_share
-
-Use `inertia_share` in `InertiaController` to automatically include data in every Inertia response:
+Add global props via `inertia_share` in `InertiaController`:
 
 ```ruby
-# app/controllers/inertia_controller.rb (already configured with flash)
-class InertiaController < ApplicationController
-  inertia_config default_render: true
-  inertia_share flash: -> { flash.to_hash }
-
-  # Add more shared data as needed:
-  inertia_share do
-    {
-      auth: {
-        user: current_user&.as_json(only: %i[id email name])
-      }
-    }
-  end
+inertia_share do
+  { auth: { user: current_user&.as_json(only: %i[id email name]) } }
 end
 ```
 
-**CSRF tokens are handled automatically** - No configuration needed. Inertia's Rails adapter includes the proper CSRF token in all requests.
+CSRF tokens are handled automatically.
 
-### Backend: Error handling in production
+### Authorization
 
-Use `rescue_from` in `ApplicationController` to return proper Inertia error pages instead of allowing modal error displays:
-
-```ruby
-class ApplicationController < ActionController::Base
-  rescue_from StandardError do |exception|
-    render inertia: 'Error', props: {
-      status: 500,
-      message: exception.message
-    }, status: 500
-  end
-end
-```
-
-### Authorization through props
-
-**Always pass authorization checks as props** - Don't rely on server-side helpers in React components:
+Pass authorization checks as props (don't rely on server helpers in React):
 
 ```ruby
-# ✅ CORRECT: Pass authorization in props
-def show
-  @post = Post.find(params[:id])
-  render inertia: 'Posts/Show', props: {
-    post: @post.as_json,
-    can_edit: policy(@post).update?,
-    can_delete: policy(@post).destroy?
-  }
-end
-```
-
-```tsx
-// In React component
-const PostShow = ({ post, can_edit, can_delete }) => (
-  <>
-    {can_edit && <Button>Edit</Button>}
-    {can_delete && <Button>Delete</Button>}
-  </>
-);
+render inertia: 'Posts/Show', props: {
+  post: @post.as_json,
+  can_edit: policy(@post).update?
+}
 ```
 
 ### File uploads with PUT/PATCH
 
-**Important:** When using file uploads with `PUT` or `PATCH`, use method spoofing since multipart requests don't support these methods natively:
+Use method spoofing for file uploads with PUT/PATCH (multipart doesn't support these natively):
 
 ```tsx
-// ✅ CORRECT: Method spoofing for file upload with PUT
 <Form action="/users/1" method="post">
   <input type="hidden" name="_method" value="put" />
   <input type="file" name="avatar" />
-  <button type="submit">Upload</button>
 </Form>
 ```
 
-### Performance: Deferred props
+### Performance
 
-Use deferred props to load non-critical data after initial page render:
+**Deferred props:** `stats: InertiaRails.defer { expensive_calculation }` loads after initial render. Group with `group: 'name'` for parallel fetching.
 
-```ruby
-# Controller
-def show
-  render inertia: 'Dashboard', props: {
-    user: current_user.as_json,
-    stats: InertiaRails.defer { expensive_stats_calculation }
-  }
-end
-```
+**Lazy loading:** Remove `{ eager: true }` from `import.meta.glob('../pages/**/*.tsx')` to enable code splitting (large apps only).
 
-Frontend receives stats after initial render. Group related deferred props with `group: 'analytics'` for parallel fetching.
+### Misc
 
-### Performance: Lazy loading components
-
-For large apps, remove `{ eager: true }` from component resolution to enable code splitting:
-
-```ts
-// app/frontend/entrypoints/inertia.ts
-import.meta.glob('../pages/**/*.tsx'); // Lazy loads by default
-```
-
-Small apps benefit from single bundles (keep `eager: true`).
-
-### Form history state preservation
-
-If you need form state to persist across browser history navigation, provide a unique form key:
-
-```tsx
-// ✅ With form key - state persists in history
-const form = useForm('CreateUser', { name: '', email: '' });
-
-// ❌ Without key - state is lost on navigation
-const form = useForm({ name: '', email: '' });
-```
-
-### Progress events (file uploads only)
-
-Progress tracking only works during file uploads. Regular form submissions don't expose progress events.
+- **Form history:** Use `useForm('UniqueKey', {...})` to persist form state across browser navigation
+- **Progress events:** Only work during file uploads, not regular form submissions
 
 ## Preferences
 
