@@ -31,4 +31,5 @@ end
 
 group :test do
   gem "sqlite3", ">= 2.1"
+  gem "shoulda-matchers", "~> 6.0"
 end
