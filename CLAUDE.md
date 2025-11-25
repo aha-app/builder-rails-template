@@ -272,6 +272,11 @@ end
 
 **Available matchers:** `render_component`, `include_props`, `have_exact_props`, `include_view_data`, `have_exact_view_data`
 
+**HTTP status codes:**
+
+- Use `:unprocessable_content` (not `:unprocessable_entity`) - the latter is deprecated in Rack
+- Example: `expect(response).to have_http_status(:unprocessable_content)`
+
 ### When to deviate
 
 - **Complex forms**: Use `useForm` if you need programmatic control, real-time validation, or field interdependencies
