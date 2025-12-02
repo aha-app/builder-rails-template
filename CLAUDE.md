@@ -1,6 +1,6 @@
 # Builder Application
 
-This is a Rails 8 application template using Inertia.js with React. It is a greenfield Rails app using Minitest with no existing models/controllers to reference.
+This is a Rails 8 application template using Inertia.js with React. It is a greenfield Rails app using Rspec with no existing models/controllers to reference.
 
 ## Stack
 
@@ -25,8 +25,8 @@ Tailwind CSS v4 via Vite plugin. Stylesheet: `app/frontend/entrypoints/applicati
 - ./bin/rails generate model # Generates a new Rails model with migrations and tests
 - ./bin/rails generate migration # Generates a new Rails migration
 - ./bin/rails generate authentication # Generates a full authentication system with user models and sessions
-- ./bin/rails test # Runs the Rails test suite
-- ./bin/ci # Runs Rails tests, Rubocop, JS/TS lint, and TypeScript type checks. All in one command.
+- bundle exec rspec # Runs the RSpec test suite
+- ./bin/ci # Runs RSpec tests, Rubocop, JS/TS lint, and TypeScript type checks. All in one command.
 - ./bin/rails js:routes # Generates TypeScript definitions for Rails routes
 - bundle exec rubocop # Runs Ruby linter
 - npm type-check # Runs TypeScript type checks
@@ -69,8 +69,8 @@ Use method spoofing for file uploads with PUT/PATCH (multipart doesn't support t
 
 ```tsx
 <Form action="/users/1" method="post">
-  <input type="hidden" name="_method" value="put" />
-  <input type="file" name="avatar" />
+	<input type="hidden" name="_method" value="put" />
+	<input type="file" name="avatar" />
 </Form>
 ```
 
@@ -112,27 +112,27 @@ import { Form } from '@inertiajs/react';
 
 // ✅ CORRECT: Uncontrolled form with resetOnSuccess
 export default () => (
-  <Form action="/users" method="post" resetOnSuccess>
-    {({ errors, processing }) => (
-      <>
-        <input type="text" name="name" defaultValue="John" />
-        {errors.name && <div>{errors.name}</div>}
+	<Form action="/users" method="post" resetOnSuccess>
+		{({ errors, processing }) => (
+			<>
+				<input type="text" name="name" defaultValue="John" />
+				{errors.name && <div>{errors.name}</div>}
 
-        <input type="text" name="user.skills[]" />
-        <input type="file" name="avatar" />
+				<input type="text" name="user.skills[]" />
+				<input type="file" name="avatar" />
 
-        <button type="submit" disabled={processing}>
-          {processing ? 'Submitting...' : 'Submit'}
-        </button>
-      </>
-    )}
-  </Form>
+				<button type="submit" disabled={processing}>
+					{processing ? 'Submitting...' : 'Submit'}
+				</button>
+			</>
+		)}
+	</Form>
 );
 
 // ❌ WRONG: Controlled inputs with useState
 const [name, setName] = useState('');
 <Form action="/users" method="post">
-  <input value={name} onChange={(e) => setName(e.target.value)} />
+	<input value={name} onChange={(e) => setName(e.target.value)} />
 </Form>;
 ```
 
@@ -156,11 +156,11 @@ Use `Empty` component slots (no direct `title`/`description` props):
 
 ```tsx
 <Empty>
-  <EmptyHeader>
-    <EmptyTitle>Title</EmptyTitle>
-    <EmptyDescription>Description</EmptyDescription>
-  </EmptyHeader>
-  <EmptyContent>{/* actions */}</EmptyContent>
+	<EmptyHeader>
+		<EmptyTitle>Title</EmptyTitle>
+		<EmptyDescription>Description</EmptyDescription>
+	</EmptyHeader>
+	<EmptyContent>{/* actions */}</EmptyContent>
 </Empty>
 ```
 
@@ -224,8 +224,58 @@ items.as_json(only: %i[id name created_at])
 
 ### Testing
 
-- **Models**: `test/models/item_test.rb` - validate presence, length, associations
-- **Controllers**: `test/controllers/items_controller_test.rb` - test all CRUD actions (happy path + validation failures)
+Uses RSpec with Inertia testing helpers enabled. Add `:inertia` flag to request specs for Inertia matchers.
+
+- **Models**: `spec/models/item_spec.rb` - validate presence, length, associations
+- **Controllers**: `spec/requests/items_spec.rb` - test all CRUD actions (happy path + validation failures)
+
+**Inertia test examples:**
+
+```ruby
+RSpec.describe "/items", inertia: true do
+  # Test component rendering and props
+  describe "GET /index" do
+    it "renders component with props" do
+      get items_path
+      expect(inertia).to render_component("Items/Index")
+      expect(inertia).to include_props(items: [])
+      expect(inertia.props[:items]).to be_an(Array)
+    end
+  end
+
+  # Test successful form submission (redirects with 303)
+  describe "POST /items" do
+    it "redirects on success" do
+      post items_path, params: { item: { name: "Test" } }
+      expect(response).to have_http_status(:see_other)
+      expect(response).to redirect_to(items_path)
+    end
+  end
+
+  # Test validation errors (re-renders with errors in props)
+  describe "POST /items with invalid data" do
+    it "renders form with errors" do
+      post items_path, params: { item: { name: "" } }
+      expect(inertia).to render_component("Items/New")
+      expect(inertia.props[:errors][:name]).to be_present
+    end
+  end
+
+  # Test shared data (from inertia_share)
+  it "includes shared auth data" do
+    get items_path
+    expect(inertia).to include_view_data(auth: anything)
+    expect(inertia.view_data[:flash]).to eq({})
+  end
+end
+```
+
+**Available matchers:** `render_component`, `include_props`, `have_exact_props`, `include_view_data`, `have_exact_view_data`
+
+**HTTP status codes:**
+
+- Use `:unprocessable_content` (not `:unprocessable_entity`) - the latter is deprecated in Rack
+- Example: `expect(response).to have_http_status(:unprocessable_content)`
 
 ### When to deviate
 
