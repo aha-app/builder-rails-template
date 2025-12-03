@@ -15,9 +15,6 @@ export default defineConfig({
     ViteRuby(),
     EnvironmentPlugin({ RAILS_ENV: "development" }),
   ],
-  define: {
-    __REACT_DEVTOOLS_GLOBAL_HOOK__: "({ isDisabled: true })",
-  },
   server: {
     hmr: false,
   },

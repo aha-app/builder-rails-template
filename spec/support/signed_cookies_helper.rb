@@ -1,22 +1,14 @@
 # frozen_string_literal: true
 
 module SignedCookiesHelper
+  # Reads signed cookies set by your application
+  # Returns the decrypted values, not the encrypted cookie strings
+  #
+  # Example:
+  #   get login_path, params: { email: user.email, password: 'secret' }
+  #   expect(signed_cookies[:session_id]).to eq(session.id)
   def signed_cookies
-    cookies_hash = {}
-
-    cookies.instance_variable_get(:@cookies).each do |cookie|
-      value = cookie.value
-      # Decode signed cookies using Rails' message verifier
-      decoded_value = begin
-        Rails.application.message_verifier(:cookies).verify(value)
-      rescue ActiveSupport::MessageVerifier::InvalidSignature
-        value # Return raw value if not signed
-      end
-
-      cookies_hash[cookie.name.to_sym] = decoded_value
-    end
-
-    cookies_hash
+    ActionDispatch::Cookies::CookieJar.build(request, cookies.to_hash).signed
   end
 end
 

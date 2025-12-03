@@ -4,6 +4,7 @@ This project uses RSpec with Inertia testing helpers. Add `:inertia` flag to req
 
 ## Testing Strategy
 
+- Prefer fixtures over factories for simple models. Use FactoryBot for complex models or associations.
 - **Models**: `spec/models/item_spec.rb` - validate presence, length, associations
 - **Controllers**: `spec/requests/items_spec.rb` - test all CRUD actions (happy path + validation failures)
 
@@ -151,13 +152,13 @@ end
 
 Available matchers for testing Inertia responses:
 
-| Matcher | Usage | Description |
-|---------|-------|-------------|
-| `render_component` | `expect(inertia).to render_component("items/index")` | Asserts rendered component name |
-| `include_props` | `expect(inertia).to include_props(items: [])` | Asserts props include specified keys |
-| `have_exact_props` | `expect(inertia).to have_exact_props(items: [])` | Asserts props match exactly |
-| `include_view_data` | `expect(inertia).to include_view_data(auth: anything)` | Asserts view_data includes keys |
-| `have_exact_view_data` | `expect(inertia).to have_exact_view_data(...)` | Asserts view_data matches exactly |
+| Matcher                | Usage                                                  | Description                          |
+| ---------------------- | ------------------------------------------------------ | ------------------------------------ |
+| `render_component`     | `expect(inertia).to render_component("items/index")`   | Asserts rendered component name      |
+| `include_props`        | `expect(inertia).to include_props(items: [])`          | Asserts props include specified keys |
+| `have_exact_props`     | `expect(inertia).to have_exact_props(items: [])`       | Asserts props match exactly          |
+| `include_view_data`    | `expect(inertia).to include_view_data(auth: anything)` | Asserts view_data includes keys      |
+| `have_exact_view_data` | `expect(inertia).to have_exact_view_data(...)`         | Asserts view_data matches exactly    |
 
 ## HTTP Status Codes
 
@@ -271,28 +272,45 @@ end
 
 ## Testing Signed Cookies
 
-Use `signed_cookies` helper to test signed cookie values:
+Use the `signed_cookies` helper to read and verify signed cookie values set by your application.
+
+### Reading Signed Cookies
 
 ```ruby
-# spec/support/signed_cookies_helper.rb
-module SignedCookiesHelper
-  def signed_cookies
-    request.cookie_jar.signed
-  end
-end
-
-RSpec.configure do |config|
-  config.include SignedCookiesHelper, type: :request
-end
-
-# In your specs
 describe "POST /session" do
-  it "sets session cookie" do
+  it "sets session cookie on login" do
     user = create(:user)
     post session_path, params: { email_address: user.email_address, password: 'secret' }
 
+    # signed_cookies returns the decrypted value
     expect(signed_cookies[:session_id]).to eq(user.sessions.last.id)
   end
+end
+```
+
+### Setting Up Authentication State in Tests
+
+**Important:** You cannot directly set signed cookies from within tests (e.g., `cookies.signed[:user_id] = 123` in a `before` block).
+**Solution:** Use your actual login endpoint to set authentication cookies:
+
+```ruby
+# spec/support/session_helper.rb
+module SessionHelper
+  def sign_in(user)
+    post session_path, params: {
+      email_address: user.email_address,
+      password: user.password
+    }
+  end
+end
+
+# In specs
+before { sign_in(user) }
+
+it "accesses protected resource" do
+  get dashboard_path
+  expect(response).to have_http_status(:ok)
+  expect(signed_cookies[:session_id]).to be_present
 end
 ```
 
