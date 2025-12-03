@@ -160,32 +160,459 @@ Use `inertia_errors(model)` helper for validation errors (returns `{ errors: { f
 
 ## Component Patterns
 
-See [detailed component guide](docs/COMPONENTS.md) for full reference.
+This guide covers shadcn/ui component patterns and common import mistakes.
 
-**IMPORTANT:** Forms must be fully inside or fully outside Card components. Do not split Card structure across Form boundaries. See [Form and Card nesting guide](docs/COMPONENTS.md#form-and-card-component-nesting).
+**IMPORTANT:** Forms must be fully inside or fully outside Card components. Do not split Card structure across Form boundaries.
 
-### Quick Reference
+### Component Import Reference
 
-| Component   | Import                     | Notes                                                   |
-| ----------- | -------------------------- | ------------------------------------------------------- |
-| Empty state | `@/components/ui/empty`    | Use slot components (EmptyHeader, EmptyTitle, etc.)     |
-| Forms       | `@/components/ui/field`    | Field exports: FieldLabel, FieldError, FieldDescription |
-| Inputs      | `@/components/ui/input`    | **No FieldInput export** - import Input separately      |
-| Textarea    | `@/components/ui/textarea` | Import separately from field components                 |
-| Card        | `@/components/ui/card`     | **Keep Form fully inside or outside Card**              |
+| Component | Import Path | Exports | Notes |
+|-----------|-------------|---------|-------|
+| **Empty** | `@/components/ui/empty` | Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyContent | Use slot components (no direct props) |
+| **Field** | `@/components/ui/field` | Field, FieldLabel, FieldError, FieldDescription, FieldGroup, FieldSet, FieldLegend, FieldContent, FieldTitle, FieldSeparator | **No FieldInput export** |
+| **Input** | `@/components/ui/input` | Input | Import separately from Field |
+| **Textarea** | `@/components/ui/textarea` | Textarea | Import separately from Field |
+| **Select** | `@/components/ui/select` | Select | Import separately from Field |
+| **Button** | `@/components/ui/button` | Button | Standard button component |
+| **Card** | `@/components/ui/card` | Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter | **Keep Form fully inside or outside Card** |
+| **Form** | `@inertiajs/react` | Form | Inertia form component |
+| **Link** | `@inertiajs/react` | Link | Inertia link component |
 
-### Empty State Example
+### Common Import Mistakes
+
+#### FieldInput Does Not Exist
+
+The shadcn/ui `Field` component does **not** export `FieldInput`. Use `Input` from `@/components/ui/input` instead.
 
 ```tsx
-<Empty>
-  <EmptyHeader>
-    <EmptyTitle>No items found</EmptyTitle>
-    <EmptyDescription>
-      Get started by creating your first item.
-    </EmptyDescription>
-  </EmptyHeader>
-  <EmptyContent>{/* actions */}</EmptyContent>
-</Empty>
+// ❌ WRONG - FieldInput doesn't exist
+import { Field, FieldLabel, FieldInput } from '@/components/ui/field';
+
+// ✅ CORRECT - Import Input separately
+import { Field, FieldLabel, FieldError } from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
+
+// Usage
+<Field>
+  <FieldLabel>Email</FieldLabel>
+  <Input name="email" type="email" />
+  {errors?.email && <FieldError>{errors.email}</FieldError>}
+</Field>
+```
+
+#### Available Field Exports
+
+**Field components:**
+- `Field` - Wrapper component
+- `FieldLabel` - Label for field
+- `FieldError` - Error message display
+- `FieldDescription` - Help text/description
+
+**Field grouping:**
+- `FieldGroup` - Group multiple fields
+- `FieldSet` - Fieldset wrapper
+- `FieldLegend` - Legend for fieldset
+- `FieldContent` - Content wrapper
+- `FieldTitle` - Title component
+- `FieldSeparator` - Visual separator
+
+**Separate imports needed:**
+- `Input` from `@/components/ui/input`
+- `Textarea` from `@/components/ui/textarea`
+- `Select` from `@/components/ui/select`
+
+### Empty State Pattern
+
+Use `Empty` component with slot-based composition (no direct `title`/`description` props):
+
+```tsx
+import {
+  Empty,
+  EmptyHeader,
+  EmptyTitle,
+  EmptyDescription,
+  EmptyContent
+} from '@/components/ui/empty'
+import { Button } from '@/components/ui/button'
+import { Link } from '@inertiajs/react'
+
+export default function ItemsIndex({ items }) {
+  if (items.length === 0) {
+    return (
+      <Empty>
+        <EmptyHeader>
+          <EmptyTitle>No items found</EmptyTitle>
+          <EmptyDescription>
+            Get started by creating your first item.
+          </EmptyDescription>
+        </EmptyHeader>
+        <EmptyContent>
+          <Link href="/items/new">
+            <Button>Create Item</Button>
+          </Link>
+        </EmptyContent>
+      </Empty>
+    )
+  }
+
+  // ... render items
+}
+```
+
+### Form Field Patterns
+
+#### Basic Text Input
+
+```tsx
+import { Field, FieldLabel, FieldError } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
+
+<Field>
+  <FieldLabel>Name</FieldLabel>
+  <Input name="item[name]" defaultValue={item.name} />
+  {errors?.name && <FieldError>{errors.name}</FieldError>}
+</Field>
+```
+
+#### Textarea
+
+```tsx
+import { Field, FieldLabel, FieldError, FieldDescription } from '@/components/ui/field'
+import { Textarea } from '@/components/ui/textarea'
+
+<Field>
+  <FieldLabel>Description</FieldLabel>
+  <FieldDescription>Optional description for your item</FieldDescription>
+  <Textarea name="item[description]" defaultValue={item.description} rows={4} />
+  {errors?.description && <FieldError>{errors.description}</FieldError>}
+</Field>
+```
+
+#### Select
+
+```tsx
+import { Field, FieldLabel, FieldError } from '@/components/ui/field'
+import { Select } from '@/components/ui/select'
+
+<Field>
+  <FieldLabel>Category</FieldLabel>
+  <Select name="item[category]" defaultValue={item.category}>
+    <option value="">Select a category</option>
+    <option value="electronics">Electronics</option>
+    <option value="clothing">Clothing</option>
+  </Select>
+  {errors?.category && <FieldError>{errors.category}</FieldError>}
+</Field>
+```
+
+#### Checkbox
+
+```tsx
+import { Field, FieldLabel } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
+
+<Field>
+  <label className="flex items-center gap-2">
+    <Input type="checkbox" name="item[featured]" defaultChecked={item.featured} />
+    <FieldLabel>Featured item</FieldLabel>
+  </label>
+</Field>
+```
+
+#### File Upload
+
+```tsx
+import { Field, FieldLabel, FieldError, FieldDescription } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
+
+<Field>
+  <FieldLabel>Attachment</FieldLabel>
+  <FieldDescription>PDF, PNG, or JPG (max 10MB)</FieldDescription>
+  <Input type="file" name="item[attachment]" accept=".pdf,.png,.jpg" />
+  {errors?.attachment && <FieldError>{errors.attachment}</FieldError>}
+</Field>
+```
+
+### Field Grouping
+
+#### FieldSet for Related Fields
+
+```tsx
+import {
+  Field,
+  FieldSet,
+  FieldLegend,
+  FieldLabel,
+  FieldError
+} from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
+
+<FieldSet>
+  <FieldLegend>Contact Information</FieldLegend>
+
+  <Field>
+    <FieldLabel>Email</FieldLabel>
+    <Input type="email" name="contact[email]" />
+    {errors?.email && <FieldError>{errors.email}</FieldError>}
+  </Field>
+
+  <Field>
+    <FieldLabel>Phone</FieldLabel>
+    <Input type="tel" name="contact[phone]" />
+    {errors?.phone && <FieldError>{errors.phone}</FieldError>}
+  </Field>
+</FieldSet>
+```
+
+#### FieldGroup for Horizontal Layout
+
+```tsx
+import { FieldGroup, Field, FieldLabel } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
+
+<FieldGroup>
+  <Field>
+    <FieldLabel>First Name</FieldLabel>
+    <Input name="user[first_name]" />
+  </Field>
+
+  <Field>
+    <FieldLabel>Last Name</FieldLabel>
+    <Input name="user[last_name]" />
+  </Field>
+</FieldGroup>
+```
+
+### Complete Form Example
+
+```tsx
+import { Form } from '@inertiajs/react'
+import { Field, FieldLabel, FieldError, FieldDescription } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Button } from '@/components/ui/button'
+
+type Props = {
+  item: {
+    name?: string
+    description?: string
+    price?: number
+  }
+  errors?: {
+    name?: string
+    description?: string
+    price?: string
+  }
+}
+
+export default function ItemForm({ item, errors }: Props) {
+  return (
+    <Form action="/items" method="post" resetOnSuccess>
+      {({ processing }) => (
+        <div className="space-y-6">
+          <Field>
+            <FieldLabel>Name</FieldLabel>
+            <Input name="item[name]" defaultValue={item.name} />
+            {errors?.name && <FieldError>{errors.name}</FieldError>}
+          </Field>
+
+          <Field>
+            <FieldLabel>Description</FieldLabel>
+            <FieldDescription>
+              Provide a detailed description of the item
+            </FieldDescription>
+            <Textarea name="item[description]" defaultValue={item.description} />
+            {errors?.description && <FieldError>{errors.description}</FieldError>}
+          </Field>
+
+          <Field>
+            <FieldLabel>Price</FieldLabel>
+            <Input
+              type="number"
+              name="item[price]"
+              defaultValue={item.price}
+              step="0.01"
+            />
+            {errors?.price && <FieldError>{errors.price}</FieldError>}
+          </Field>
+
+          <div className="flex gap-4">
+            <Button type="submit" disabled={processing}>
+              {processing ? 'Saving...' : 'Save Item'}
+            </Button>
+            <Button type="button" variant="outline">
+              Cancel
+            </Button>
+          </div>
+        </div>
+      )}
+    </Form>
+  )
+}
+```
+
+### Form and Card Component Nesting
+
+**IMPORTANT**: Forms must be fully inside or fully outside Card components. Do not split Card structure across Form boundaries.
+
+```tsx
+// ❌ WRONG - Form breaks Card component hierarchy
+<Card>
+  <CardHeader>
+    <CardTitle>Create an account</CardTitle>
+  </CardHeader>
+  <Form action={signupPath()} method="post">
+    {({ processing }) => (
+      <>
+        <CardContent className="space-y-4">
+          {/* Form fields */}
+        </CardContent>
+        <CardFooter>
+          <Button type="submit">Submit</Button>
+        </CardFooter>
+      </>
+    )}
+  </Form>
+</Card>
+
+// ✅ CORRECT - Form inside CardContent
+<Card>
+  <CardHeader>
+    <CardTitle>Create an account</CardTitle>
+    <CardDescription>Enter your details to sign up for an account</CardDescription>
+  </CardHeader>
+  <CardContent>
+    <Form action={signupPath()} method="post">
+      {({ processing }) => (
+        <div className="space-y-4">
+          {/* Form fields */}
+          <Button type="submit" disabled={processing}>
+            {processing ? 'Submitting...' : 'Submit'}
+          </Button>
+        </div>
+      )}
+    </Form>
+  </CardContent>
+</Card>
+
+// ✅ ALSO CORRECT - Form wraps entire Card
+<Form action={signupPath()} method="post">
+  {({ processing }) => (
+    <Card>
+      <CardHeader>
+        <CardTitle>Create an account</CardTitle>
+        <CardDescription>Enter your details to sign up for an account</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {/* Form fields */}
+      </CardContent>
+      <CardFooter>
+        <Button type="submit" disabled={processing}>
+          {processing ? 'Submitting...' : 'Submit'}
+        </Button>
+      </CardFooter>
+    </Card>
+  )}
+</Form>
+```
+
+#### Why This Matters
+
+- **Breaking Card's component structure causes styling and semantic issues**
+- **Card components expect direct children in a specific order** (Header → Content → Footer)
+- **Form's render function creates a new component boundary** that disrupts this hierarchy
+
+**General rule:** Keep component hierarchies intact. If a parent component expects specific children structure (like Card), don't interrupt it with wrapper components like Form.
+
+### Layout Components
+
+#### PersistentLayout
+
+Used for pages that share navigation/header:
+
+```tsx
+import PersistentLayout from '@/layouts/PersistentLayout'
+
+export default function Index({ items }) {
+  return <div>{/* page content */}</div>
+}
+
+Index.layout = (page: React.ReactNode) => (
+  <PersistentLayout children={page} />
+)
+```
+
+#### Custom Per-Page Layout
+
+Override the layout for specific pages:
+
+```tsx
+import CustomLayout from '@/layouts/CustomLayout'
+
+export default function SpecialPage() {
+  return <div>{/* page content */}</div>
+}
+
+SpecialPage.layout = (page: React.ReactNode) => (
+  <CustomLayout children={page} />
+)
+```
+
+### TypeScript Types
+
+#### Page Props Type
+
+```tsx
+type Item = {
+  id: number
+  name: string
+  description: string | null
+  created_at: string
+}
+
+type Props = {
+  item: Item
+  errors?: Record<string, string>
+}
+
+export default function Show({ item, errors }: Props) {
+  // ...
+}
+```
+
+#### Shared Props (from inertia_share)
+
+```tsx
+// Define in types/inertia.d.ts
+declare module '@inertiajs/core' {
+  interface PageProps {
+    auth: {
+      user: {
+        id: number
+        email: string
+        name: string
+      } | null
+    }
+    flash: {
+      notice?: string
+      alert?: string
+    }
+  }
+}
+
+// Access in components
+import { usePage } from '@inertiajs/react'
+
+export default function MyComponent() {
+  const { auth, flash } = usePage().props
+
+  return (
+    <div>
+      {auth.user && <p>Hello, {auth.user.name}</p>}
+      {flash.notice && <div className="notice">{flash.notice}</div>}
+    </div>
+  )
+}
 ```
 
 # Standard CRUD Pattern
@@ -451,3 +878,403 @@ Send only what the page needs:
 - **Non-RESTful actions**: Add custom routes/actions when CRUD doesn't fit the domain model
 - **Custom layouts**: Override default `PersistentLayout` per-page if needed
 - **Nested resources**: Use nested routes (`resources :projects do resources :tasks end`) when appropriate
+
+# Testing Guide
+
+This project uses RSpec with Inertia testing helpers. Add `:inertia` flag to request specs for Inertia matchers.
+
+## Testing Strategy
+
+- Prefer fixtures over factories for simple models. Use FactoryBot for complex models or associations.
+- **Models**: `spec/models/item_spec.rb` - validate presence, length, associations
+- **Controllers**: `spec/requests/items_spec.rb` - test all CRUD actions (happy path + validation failures)
+
+## Model Specs
+
+Test validations, associations, and custom methods:
+
+```ruby
+# spec/models/item_spec.rb
+require 'rails_helper'
+
+RSpec.describe Item do
+  describe 'validations' do
+    it { should validate_presence_of(:name) }
+    it { should validate_length_of(:name).is_at_most(255) }
+  end
+
+  describe 'associations' do
+    it { should belong_to(:user) }
+    it { should have_many(:comments) }
+  end
+end
+```
+
+## Request Specs (Controllers)
+
+### Basic Pattern
+
+```ruby
+# spec/requests/items_spec.rb
+require 'rails_helper'
+
+RSpec.describe "/items", inertia: true do
+  let(:user) { create(:user) }
+  let(:valid_attributes) { { name: "Test Item", description: "Description" } }
+  let(:invalid_attributes) { { name: "" } }
+
+  before { sign_in(user) } # if authentication required
+
+  describe "GET /index" do
+    it "renders component with props" do
+      item = Item.create!(valid_attributes)
+      get items_path
+
+      expect(inertia).to render_component("items/index")
+      expect(inertia).to include_props(items: [])
+      expect(inertia.props[:items]).to be_an(Array)
+      expect(inertia.props[:items].first['name']).to eq("Test Item")
+    end
+  end
+
+  describe "GET /show" do
+    it "renders component with item" do
+      item = Item.create!(valid_attributes)
+      get item_path(item)
+
+      expect(inertia).to render_component("items/show")
+      expect(inertia.props[:item]['id']).to eq(item.id)
+    end
+  end
+
+  describe "GET /new" do
+    it "renders new form component" do
+      get new_item_path
+
+      expect(inertia).to render_component("items/new")
+      expect(inertia.props[:item]).to be_present
+    end
+  end
+
+  describe "GET /edit" do
+    it "renders edit form component" do
+      item = Item.create!(valid_attributes)
+      get edit_item_path(item)
+
+      expect(inertia).to render_component("items/edit")
+      expect(inertia.props[:item]['id']).to eq(item.id)
+    end
+  end
+
+  describe "POST /items" do
+    context "with valid params" do
+      it "creates item and redirects" do
+        expect {
+          post items_path, params: { item: valid_attributes }
+        }.to change(Item, :count).by(1)
+
+        expect(response).to have_http_status(:see_other)
+        expect(response).to redirect_to(items_path)
+      end
+    end
+
+    context "with invalid params" do
+      it "renders form with errors" do
+        post items_path, params: { item: invalid_attributes }
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(inertia).to render_component("items/new")
+        expect(inertia.props[:errors][:name]).to be_present
+      end
+    end
+  end
+
+  describe "PATCH /items/:id" do
+    let(:item) { Item.create!(valid_attributes) }
+    let(:new_attributes) { { name: "Updated Name" } }
+
+    context "with valid params" do
+      it "updates item and redirects" do
+        patch item_path(item), params: { item: new_attributes }
+
+        expect(response).to have_http_status(:see_other)
+        expect(response).to redirect_to(items_path)
+        expect(item.reload.name).to eq("Updated Name")
+      end
+    end
+
+    context "with invalid params" do
+      it "renders form with errors" do
+        patch item_path(item), params: { item: invalid_attributes }
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(inertia).to render_component("items/edit")
+        expect(inertia.props[:errors][:name]).to be_present
+      end
+    end
+  end
+
+  describe "DELETE /items/:id" do
+    it "destroys item and redirects" do
+      item = Item.create!(valid_attributes)
+
+      expect {
+        delete item_path(item)
+      }.to change(Item, :count).by(-1)
+
+      expect(response).to have_http_status(:see_other)
+      expect(response).to redirect_to(items_path)
+    end
+  end
+end
+```
+
+## Inertia Matchers
+
+Available matchers for testing Inertia responses:
+
+| Matcher                | Usage                                                  | Description                          |
+| ---------------------- | ------------------------------------------------------ | ------------------------------------ |
+| `render_component`     | `expect(inertia).to render_component("items/index")`   | Asserts rendered component name      |
+| `include_props`        | `expect(inertia).to include_props(items: [])`          | Asserts props include specified keys |
+| `have_exact_props`     | `expect(inertia).to have_exact_props(items: [])`       | Asserts props match exactly          |
+| `include_view_data`    | `expect(inertia).to include_view_data(auth: anything)` | Asserts view_data includes keys      |
+| `have_exact_view_data` | `expect(inertia).to have_exact_view_data(...)`         | Asserts view_data matches exactly    |
+
+## HTTP Status Codes
+
+Use the correct status codes for Inertia responses:
+
+- **Success (redirect)**: `:see_other` (303)
+- **Validation error**: `:unprocessable_content` (422)
+- **Not found**: `:not_found` (404)
+
+**Important:** Use `:unprocessable_content` (not `:unprocessable_entity`) - the latter is deprecated in Rack.
+
+```ruby
+# ✅ CORRECT
+expect(response).to have_http_status(:unprocessable_content)
+
+# ❌ WRONG
+expect(response).to have_http_status(:unprocessable_entity)
+```
+
+## Inertia Props and Keys
+
+When using `.as_json` to serialize models, the resulting props have **string keys**, not symbol keys.
+
+```ruby
+# Controller
+inertia_share auth: -> {
+  {
+    user: current_user&.as_json(only: %i[id email_address])
+  }
+}
+
+# ✅ CORRECT - Access with string keys
+expect(inertia.props[:auth][:user]['email_address']).to eq('test@example.com')
+
+# ❌ WRONG - Symbol key won't work for serialized attributes
+expect(inertia.props[:auth][:user][:email_address]).to eq('test@example.com')
+```
+
+### Key Access Pattern
+
+- **Top-level `inertia_share` keys**: symbols (`:auth`, `:flash`)
+- **Nested keys from `.as_json()`**: strings (`'email_address'`, `'id'`)
+- **Manually built hashes**: symbols throughout
+
+### Alternative: Manual Hash Building
+
+For symbol keys throughout, build hashes manually:
+
+```ruby
+inertia_share auth: -> {
+  {
+    user: current_user ? {
+      id: current_user.id,
+      email_address: current_user.email_address
+    } : nil
+  }
+}
+
+# Now you can use symbol keys
+expect(inertia.props[:auth][:user][:email_address]).to eq('test@example.com')
+```
+
+## Props vs View Data
+
+All `inertia_share` data goes into **props**, accessible to your React components:
+
+```ruby
+# Controller
+inertia_share flash: -> { flash.to_hash },
+              auth: -> { { user: current_user } }
+
+# ✅ CORRECT - Both are props
+expect(inertia.props[:flash][:notice]).to eq('Success!')
+expect(inertia.props[:auth][:user]).to be_present
+
+# ❌ WRONG - inertia_share doesn't create view_data
+expect(inertia.view_data[:auth]).to be_present
+```
+
+`view_data` is only used when explicitly passed and is for Rails layout, not React:
+
+```ruby
+render inertia: 'items/show',
+       props: { item: @item },
+       view_data: { meta_title: 'Details' }  # For ERB layout only
+
+# In tests
+expect(inertia).to include_view_data(meta_title: 'Details')
+```
+
+## Testing Shared Data
+
+Test that shared data (from `inertia_share`) is available on all requests:
+
+```ruby
+describe "shared data" do
+  it "includes auth data on all pages" do
+    get items_path
+
+    expect(inertia.props[:auth]).to be_present
+    expect(inertia.props[:flash]).to eq({})
+  end
+
+  it "includes flash messages" do
+    get items_path, flash: { notice: 'Success!' }
+
+    expect(inertia.props[:flash][:notice]).to eq('Success!')
+  end
+end
+```
+
+## Testing Signed Cookies
+
+Use the `signed_cookies` helper to read and verify signed cookie values set by your application.
+
+### Reading Signed Cookies
+
+```ruby
+describe "POST /session" do
+  it "sets session cookie on login" do
+    user = create(:user)
+    post session_path, params: { email_address: user.email_address, password: 'secret' }
+
+    # signed_cookies returns the decrypted value
+    expect(signed_cookies[:session_id]).to eq(user.sessions.last.id)
+  end
+end
+```
+
+### Setting Up Authentication State in Tests
+
+**Important:** You cannot directly set signed cookies from within tests (e.g., `cookies.signed[:user_id] = 123` in a `before` block).
+**Solution:** Use your actual login endpoint to set authentication cookies:
+
+```ruby
+# spec/support/session_helper.rb
+module SessionHelper
+  def sign_in(user)
+    post session_path, params: {
+      email_address: user.email_address,
+      password: user.password
+    }
+  end
+end
+
+# In specs
+before { sign_in(user) }
+
+it "accesses protected resource" do
+  get dashboard_path
+  expect(response).to have_http_status(:ok)
+  expect(signed_cookies[:session_id]).to be_present
+end
+```
+
+## Testing File Uploads
+
+```ruby
+describe "POST /items with file upload" do
+  it "uploads file successfully" do
+    file = fixture_file_upload('test.pdf', 'application/pdf')
+
+    post items_path, params: {
+      item: { name: "Test", attachment: file }
+    }
+
+    expect(response).to have_http_status(:see_other)
+    expect(Item.last.attachment).to be_attached
+  end
+end
+```
+
+## Factory Bot Setup
+
+Use FactoryBot for test data:
+
+```ruby
+# spec/factories/items.rb
+FactoryBot.define do
+  factory :item do
+    name { "Test Item" }
+    description { "Test description" }
+  end
+end
+
+# In specs
+let(:item) { create(:item) }
+let(:items) { create_list(:item, 3) }
+```
+
+## Common Testing Patterns
+
+### Testing Authorization
+
+```ruby
+describe "GET /items/:id" do
+  context "when user is authorized" do
+    it "renders the item" do
+      item = create(:item, user: user)
+      get item_path(item)
+
+      expect(inertia).to render_component("items/show")
+    end
+  end
+
+  context "when user is not authorized" do
+    it "redirects or returns forbidden" do
+      other_user_item = create(:item)
+      get item_path(other_user_item)
+
+      expect(response).to have_http_status(:forbidden)
+      # or expect(response).to redirect_to(root_path)
+    end
+  end
+end
+```
+
+### Testing with Authentication
+
+```ruby
+# spec/rails_helper.rb
+RSpec.configure do |config|
+  config.include SessionHelper, type: :request
+end
+
+# spec/support/session_helper.rb
+module SessionHelper
+  def sign_in(user)
+    post session_path, params: {
+      email_address: user.email_address,
+      password: 'password'
+    }
+  end
+end
+
+# In specs
+before { sign_in(user) }
+```
