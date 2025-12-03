@@ -72,7 +72,7 @@ Add global props via `inertia_share` in `InertiaController`:
 
 ```ruby
 inertia_share do
-  { auth: { user: current_user&.as_json(only: %i[id email name]) } }
+  { auth: { user: Current.user&.as_json(only: %i[id email name]) } }
 end
 ```
 
