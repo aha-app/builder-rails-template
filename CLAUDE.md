@@ -164,6 +164,8 @@ Use `inertia_errors(model)` helper for validation errors (returns `{ errors: { f
 
 See [detailed component guide](docs/COMPONENTS.md) for full reference.
 
+**IMPORTANT:** Forms must be fully inside or fully outside Card components. Do not split Card structure across Form boundaries. See [Form and Card nesting guide](docs/COMPONENTS.md#form-and-card-component-nesting).
+
 ### Quick Reference
 
 | Component | Import | Notes |
@@ -172,6 +174,7 @@ See [detailed component guide](docs/COMPONENTS.md) for full reference.
 | Forms | `@/components/ui/field` | Field exports: FieldLabel, FieldError, FieldDescription |
 | Inputs | `@/components/ui/input` | **No FieldInput export** - import Input separately |
 | Textarea | `@/components/ui/textarea` | Import separately from field components |
+| Card | `@/components/ui/card` | **Keep Form fully inside or outside Card** |
 
 ### Empty State Example
 
