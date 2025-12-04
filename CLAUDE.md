@@ -164,22 +164,6 @@ Use `inertia_errors(model)` helper for validation errors (returns `{ errors: { f
 
 This guide covers shadcn/ui component patterns and common import mistakes.
 
-**IMPORTANT:** Forms must be fully inside or fully outside Card components. Do not split Card structure across Form boundaries.
-
-### Component Import Reference
-
-| Component    | Import Path                | Exports                                                                                                                      | Notes                                      |
-| ------------ | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
-| **Empty**    | `@/components/ui/empty`    | Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyContent                                                               | Use slot components (no direct props)      |
-| **Field**    | `@/components/ui/field`    | Field, FieldLabel, FieldError, FieldDescription, FieldGroup, FieldSet, FieldLegend, FieldContent, FieldTitle, FieldSeparator | **No FieldInput export**                   |
-| **Input**    | `@/components/ui/input`    | Input                                                                                                                        | Import separately from Field               |
-| **Textarea** | `@/components/ui/textarea` | Textarea                                                                                                                     | Import separately from Field               |
-| **Select**   | `@/components/ui/select`   | Select                                                                                                                       | Import separately from Field               |
-| **Button**   | `@/components/ui/button`   | Button                                                                                                                       | Standard button component                  |
-| **Card**     | `@/components/ui/card`     | Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter                                                        | **Keep Form fully inside or outside Card** |
-| **Form**     | `@inertiajs/react`         | Form                                                                                                                         | Inertia form component                     |
-| **Link**     | `@inertiajs/react`         | Link                                                                                                                         | Inertia link component                     |
-
 ### Common Import Mistakes
 
 #### FieldInput Does Not Exist
@@ -276,54 +260,6 @@ import { Input } from "@/components/ui/input"
   <Input name="item[name]" defaultValue={item.name} id="item_name" />
   {errors?.name && <FieldError>{errors.name}</FieldError>}
 </Field>
-```
-
-### Field Grouping
-
-#### FieldSet for Related Fields
-
-```tsx
-import {
-  Field,
-  FieldSet,
-  FieldLegend,
-  FieldLabel,
-  FieldError,
-} from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
-;<FieldSet>
-  <FieldLegend>Contact Information</FieldLegend>
-
-  <Field>
-    <FieldLabel htmlFor="contact_email">Email</FieldLabel>
-    <Input type="email" name="contact[email]" id="contact_email" />
-    {errors?.email && <FieldError>{errors.email}</FieldError>}
-  </Field>
-
-  <Field>
-    <FieldLabel htmlFor="contact_phone">Phone</FieldLabel>
-    <Input type="tel" name="contact[phone]" id="contact_phone" />
-    {errors?.phone && <FieldError>{errors.phone}</FieldError>}
-  </Field>
-</FieldSet>
-```
-
-#### FieldGroup for Horizontal Layout
-
-```tsx
-import { FieldGroup, Field, FieldLabel } from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
-;<FieldGroup>
-  <Field>
-    <FieldLabel htmlFor="user_first_name">First Name</FieldLabel>
-    <Input name="user[first_name]" id="user_first_name" />
-  </Field>
-
-  <Field>
-    <FieldLabel htmlFor="user_last_name">Last Name</FieldLabel>
-    <Input name="user[last_name]" id="user_last_name" />
-  </Field>
-</FieldGroup>
 ```
 
 ### Complete Form Example
