@@ -3,4 +3,4 @@ set -e
 bundle exec rspec
 bundle exec rubocop -A
 npm run lint:fix
-npm run type-check
+npm run typecheck
