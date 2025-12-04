@@ -166,17 +166,17 @@ This guide covers shadcn/ui component patterns and common import mistakes.
 
 ### Component Import Reference
 
-| Component | Import Path | Exports | Notes |
-|-----------|-------------|---------|-------|
-| **Empty** | `@/components/ui/empty` | Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyContent | Use slot components (no direct props) |
-| **Field** | `@/components/ui/field` | Field, FieldLabel, FieldError, FieldDescription, FieldGroup, FieldSet, FieldLegend, FieldContent, FieldTitle, FieldSeparator | **No FieldInput export** |
-| **Input** | `@/components/ui/input` | Input | Import separately from Field |
-| **Textarea** | `@/components/ui/textarea` | Textarea | Import separately from Field |
-| **Select** | `@/components/ui/select` | Select | Import separately from Field |
-| **Button** | `@/components/ui/button` | Button | Standard button component |
-| **Card** | `@/components/ui/card` | Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter | **Keep Form fully inside or outside Card** |
-| **Form** | `@inertiajs/react` | Form | Inertia form component |
-| **Link** | `@inertiajs/react` | Link | Inertia link component |
+| Component    | Import Path                | Exports                                                                                                                      | Notes                                      |
+| ------------ | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| **Empty**    | `@/components/ui/empty`    | Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyContent                                                               | Use slot components (no direct props)      |
+| **Field**    | `@/components/ui/field`    | Field, FieldLabel, FieldError, FieldDescription, FieldGroup, FieldSet, FieldLegend, FieldContent, FieldTitle, FieldSeparator | **No FieldInput export**                   |
+| **Input**    | `@/components/ui/input`    | Input                                                                                                                        | Import separately from Field               |
+| **Textarea** | `@/components/ui/textarea` | Textarea                                                                                                                     | Import separately from Field               |
+| **Select**   | `@/components/ui/select`   | Select                                                                                                                       | Import separately from Field               |
+| **Button**   | `@/components/ui/button`   | Button                                                                                                                       | Standard button component                  |
+| **Card**     | `@/components/ui/card`     | Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter                                                        | **Keep Form fully inside or outside Card** |
+| **Form**     | `@inertiajs/react`         | Form                                                                                                                         | Inertia form component                     |
+| **Link**     | `@inertiajs/react`         | Link                                                                                                                         | Inertia link component                     |
 
 ### Common Import Mistakes
 
@@ -186,16 +186,16 @@ The shadcn/ui `Field` component does **not** export `FieldInput`. Use `Input` fr
 
 ```tsx
 // ❌ WRONG - FieldInput doesn't exist
-import { Field, FieldLabel, FieldInput } from '@/components/ui/field';
+import { Field, FieldLabel, FieldInput } from "@/components/ui/field"
 
 // ✅ CORRECT - Import Input separately
-import { Field, FieldLabel, FieldError } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
+import { Field, FieldLabel, FieldError } from "@/components/ui/field"
+import { Input } from "@/components/ui/input"
 
 // Usage
-<Field>
-  <FieldLabel>Email</FieldLabel>
-  <Input name="email" type="email" />
+;<Field>
+  <FieldLabel htmlFor="email">Email</FieldLabel>
+  <Input name="email" type="email" id="email" />
   {errors?.email && <FieldError>{errors.email}</FieldError>}
 </Field>
 ```
@@ -203,12 +203,14 @@ import { Input } from '@/components/ui/input';
 #### Available Field Exports
 
 **Field components:**
+
 - `Field` - Wrapper component
 - `FieldLabel` - Label for field
 - `FieldError` - Error message display
 - `FieldDescription` - Help text/description
 
 **Field grouping:**
+
 - `FieldGroup` - Group multiple fields
 - `FieldSet` - Fieldset wrapper
 - `FieldLegend` - Legend for fieldset
@@ -217,6 +219,7 @@ import { Input } from '@/components/ui/input';
 - `FieldSeparator` - Visual separator
 
 **Separate imports needed:**
+
 - `Input` from `@/components/ui/input`
 - `Textarea` from `@/components/ui/textarea`
 - `Select` from `@/components/ui/select`
@@ -231,10 +234,10 @@ import {
   EmptyHeader,
   EmptyTitle,
   EmptyDescription,
-  EmptyContent
-} from '@/components/ui/empty'
-import { Button } from '@/components/ui/button'
-import { Link } from '@inertiajs/react'
+  EmptyContent,
+} from "@/components/ui/empty"
+import { Button } from "@/components/ui/button"
+import { Link } from "@inertiajs/react"
 
 export default function ItemsIndex({ items }) {
   if (items.length === 0) {
@@ -264,72 +267,12 @@ export default function ItemsIndex({ items }) {
 #### Basic Text Input
 
 ```tsx
-import { Field, FieldLabel, FieldError } from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
-
-<Field>
-  <FieldLabel>Name</FieldLabel>
-  <Input name="item[name]" defaultValue={item.name} />
+import { Field, FieldLabel, FieldError } from "@/components/ui/field"
+import { Input } from "@/components/ui/input"
+;<Field>
+  <FieldLabel htmlFor="item_name">Name</FieldLabel>
+  <Input name="item[name]" defaultValue={item.name} id="item_name" />
   {errors?.name && <FieldError>{errors.name}</FieldError>}
-</Field>
-```
-
-#### Textarea
-
-```tsx
-import { Field, FieldLabel, FieldError, FieldDescription } from '@/components/ui/field'
-import { Textarea } from '@/components/ui/textarea'
-
-<Field>
-  <FieldLabel>Description</FieldLabel>
-  <FieldDescription>Optional description for your item</FieldDescription>
-  <Textarea name="item[description]" defaultValue={item.description} rows={4} />
-  {errors?.description && <FieldError>{errors.description}</FieldError>}
-</Field>
-```
-
-#### Select
-
-```tsx
-import { Field, FieldLabel, FieldError } from '@/components/ui/field'
-import { Select } from '@/components/ui/select'
-
-<Field>
-  <FieldLabel>Category</FieldLabel>
-  <Select name="item[category]" defaultValue={item.category}>
-    <option value="">Select a category</option>
-    <option value="electronics">Electronics</option>
-    <option value="clothing">Clothing</option>
-  </Select>
-  {errors?.category && <FieldError>{errors.category}</FieldError>}
-</Field>
-```
-
-#### Checkbox
-
-```tsx
-import { Field, FieldLabel } from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
-
-<Field>
-  <label className="flex items-center gap-2">
-    <Input type="checkbox" name="item[featured]" defaultChecked={item.featured} />
-    <FieldLabel>Featured item</FieldLabel>
-  </label>
-</Field>
-```
-
-#### File Upload
-
-```tsx
-import { Field, FieldLabel, FieldError, FieldDescription } from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
-
-<Field>
-  <FieldLabel>Attachment</FieldLabel>
-  <FieldDescription>PDF, PNG, or JPG (max 10MB)</FieldDescription>
-  <Input type="file" name="item[attachment]" accept=".pdf,.png,.jpg" />
-  {errors?.attachment && <FieldError>{errors.attachment}</FieldError>}
 </Field>
 ```
 
@@ -343,22 +286,21 @@ import {
   FieldSet,
   FieldLegend,
   FieldLabel,
-  FieldError
-} from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
-
-<FieldSet>
+  FieldError,
+} from "@/components/ui/field"
+import { Input } from "@/components/ui/input"
+;<FieldSet>
   <FieldLegend>Contact Information</FieldLegend>
 
   <Field>
-    <FieldLabel>Email</FieldLabel>
-    <Input type="email" name="contact[email]" />
+    <FieldLabel htmlFor="contact_email">Email</FieldLabel>
+    <Input type="email" name="contact[email]" id="contact_email" />
     {errors?.email && <FieldError>{errors.email}</FieldError>}
   </Field>
 
   <Field>
-    <FieldLabel>Phone</FieldLabel>
-    <Input type="tel" name="contact[phone]" />
+    <FieldLabel htmlFor="contact_phone">Phone</FieldLabel>
+    <Input type="tel" name="contact[phone]" id="contact_phone" />
     {errors?.phone && <FieldError>{errors.phone}</FieldError>}
   </Field>
 </FieldSet>
@@ -367,18 +309,17 @@ import { Input } from '@/components/ui/input'
 #### FieldGroup for Horizontal Layout
 
 ```tsx
-import { FieldGroup, Field, FieldLabel } from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
-
-<FieldGroup>
+import { FieldGroup, Field, FieldLabel } from "@/components/ui/field"
+import { Input } from "@/components/ui/input"
+;<FieldGroup>
   <Field>
-    <FieldLabel>First Name</FieldLabel>
-    <Input name="user[first_name]" />
+    <FieldLabel htmlFor="user_first_name">First Name</FieldLabel>
+    <Input name="user[first_name]" id="user_first_name" />
   </Field>
 
   <Field>
-    <FieldLabel>Last Name</FieldLabel>
-    <Input name="user[last_name]" />
+    <FieldLabel htmlFor="user_last_name">Last Name</FieldLabel>
+    <Input name="user[last_name]" id="user_last_name" />
   </Field>
 </FieldGroup>
 ```
@@ -386,11 +327,16 @@ import { Input } from '@/components/ui/input'
 ### Complete Form Example
 
 ```tsx
-import { Form } from '@inertiajs/react'
-import { Field, FieldLabel, FieldError, FieldDescription } from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import { Button } from '@/components/ui/button'
+import { Form } from "@inertiajs/react"
+import {
+  Field,
+  FieldLabel,
+  FieldError,
+  FieldDescription,
+} from "@/components/ui/field"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Button } from "@/components/ui/button"
 
 type Props = {
   item: {
@@ -411,34 +357,41 @@ export default function ItemForm({ item, errors }: Props) {
       {({ processing }) => (
         <div className="space-y-6">
           <Field>
-            <FieldLabel>Name</FieldLabel>
-            <Input name="item[name]" defaultValue={item.name} />
+            <FieldLabel htmlFor="item_name">Name</FieldLabel>
+            <Input name="item[name]" defaultValue={item.name} id="item_name" />
             {errors?.name && <FieldError>{errors.name}</FieldError>}
           </Field>
 
           <Field>
-            <FieldLabel>Description</FieldLabel>
+            <FieldLabel htmlFor="item_description">Description</FieldLabel>
             <FieldDescription>
               Provide a detailed description of the item
             </FieldDescription>
-            <Textarea name="item[description]" defaultValue={item.description} />
-            {errors?.description && <FieldError>{errors.description}</FieldError>}
+            <Textarea
+              name="item[description]"
+              defaultValue={item.description}
+              id="item_description"
+            />
+            {errors?.description && (
+              <FieldError>{errors.description}</FieldError>
+            )}
           </Field>
 
           <Field>
-            <FieldLabel>Price</FieldLabel>
+            <FieldLabel htmlFor="item_price">Price</FieldLabel>
             <Input
               type="number"
               name="item[price]"
               defaultValue={item.price}
               step="0.01"
+              id="item_price"
             />
             {errors?.price && <FieldError>{errors.price}</FieldError>}
           </Field>
 
           <div className="flex gap-4">
             <Button type="submit" disabled={processing}>
-              {processing ? 'Saving...' : 'Save Item'}
+              {processing ? "Saving..." : "Save Item"}
             </Button>
             <Button type="button" variant="outline">
               Cancel
@@ -531,15 +484,13 @@ export default function ItemForm({ item, errors }: Props) {
 Used for pages that share navigation/header:
 
 ```tsx
-import PersistentLayout from '@/layouts/PersistentLayout'
+import PersistentLayout from "@/layouts/PersistentLayout"
 
 export default function Index({ items }) {
   return <div>{/* page content */}</div>
 }
 
-Index.layout = (page: React.ReactNode) => (
-  <PersistentLayout children={page} />
-)
+Index.layout = (page: React.ReactNode) => <PersistentLayout children={page} />
 ```
 
 #### Custom Per-Page Layout
@@ -547,15 +498,13 @@ Index.layout = (page: React.ReactNode) => (
 Override the layout for specific pages:
 
 ```tsx
-import CustomLayout from '@/layouts/CustomLayout'
+import CustomLayout from "@/layouts/CustomLayout"
 
 export default function SpecialPage() {
   return <div>{/* page content */}</div>
 }
 
-SpecialPage.layout = (page: React.ReactNode) => (
-  <CustomLayout children={page} />
-)
+SpecialPage.layout = (page: React.ReactNode) => <CustomLayout children={page} />
 ```
 
 ### TypeScript Types
@@ -584,7 +533,7 @@ export default function Show({ item, errors }: Props) {
 
 ```tsx
 // Define in types/inertia.d.ts
-declare module '@inertiajs/core' {
+declare module "@inertiajs/core" {
   interface PageProps {
     auth: {
       user: {
@@ -601,7 +550,7 @@ declare module '@inertiajs/core' {
 }
 
 // Access in components
-import { usePage } from '@inertiajs/react'
+import { usePage } from "@inertiajs/react"
 
 export default function MyComponent() {
   const { auth, flash } = usePage().props
@@ -817,16 +766,21 @@ export default function New({ item, errors }: Props) {
         {({ processing }) => (
           <>
             <Field>
-              <FieldLabel>Name</FieldLabel>
-              <Input name="item[name]" defaultValue={item.name} />
+              <FieldLabel htmlFor="item_name">Name</FieldLabel>
+              <Input
+                name="item[name]"
+                defaultValue={item.name}
+                id="item_name"
+              />
               {errors?.name && <FieldError>{errors.name}</FieldError>}
             </Field>
 
             <Field>
-              <FieldLabel>Description</FieldLabel>
+              <FieldLabel htmlFor="item_description">Description</FieldLabel>
               <Textarea
                 name="item[description]"
                 defaultValue={item.description}
+                id="item_description"
               />
               {errors?.description && (
                 <FieldError>{errors.description}</FieldError>
