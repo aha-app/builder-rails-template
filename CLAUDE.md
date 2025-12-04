@@ -162,6 +162,24 @@ Use `inertia_errors(model)` helper for validation errors (returns `{ errors: { f
 
 ## Component Patterns
 
+This guide covers shadcn/ui component patterns and common import mistakes.
+
+**IMPORTANT:** Forms must be fully inside or fully outside Card components. Do not split Card structure across Form boundaries.
+
+### Component Import Reference
+
+| Component    | Import Path                | Exports                                                                                                                      | Notes                                      |
+| ------------ | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| **Empty**    | `@/components/ui/empty`    | Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyContent                                                               | Use slot components (no direct props)      |
+| **Field**    | `@/components/ui/field`    | Field, FieldLabel, FieldError, FieldDescription, FieldGroup, FieldSet, FieldLegend, FieldContent, FieldTitle, FieldSeparator | **No FieldInput export**                   |
+| **Input**    | `@/components/ui/input`    | Input                                                                                                                        | Import separately from Field               |
+| **Textarea** | `@/components/ui/textarea` | Textarea                                                                                                                     | Import separately from Field               |
+| **Select**   | `@/components/ui/select`   | Select                                                                                                                       | Import separately from Field               |
+| **Button**   | `@/components/ui/button`   | Button                                                                                                                       | Standard button component                  |
+| **Card**     | `@/components/ui/card`     | Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter                                                        | **Keep Form fully inside or outside Card** |
+| **Form**     | `@inertiajs/react`         | Form                                                                                                                         | Inertia form component                     |
+| **Link**     | `@inertiajs/react`         | Link                                                                                                                         | Inertia link component                     |
+
 ### Common Import Mistakes
 
 #### FieldInput Does Not Exist
@@ -258,6 +276,54 @@ import { Input } from "@/components/ui/input"
   <Input name="item[name]" defaultValue={item.name} id="item_name" />
   {errors?.name && <FieldError>{errors.name}</FieldError>}
 </Field>
+```
+
+### Field Grouping
+
+#### FieldSet for Related Fields
+
+```tsx
+import {
+  Field,
+  FieldSet,
+  FieldLegend,
+  FieldLabel,
+  FieldError,
+} from "@/components/ui/field"
+import { Input } from "@/components/ui/input"
+;<FieldSet>
+  <FieldLegend>Contact Information</FieldLegend>
+
+  <Field>
+    <FieldLabel htmlFor="contact_email">Email</FieldLabel>
+    <Input type="email" name="contact[email]" id="contact_email" />
+    {errors?.email && <FieldError>{errors.email}</FieldError>}
+  </Field>
+
+  <Field>
+    <FieldLabel htmlFor="contact_phone">Phone</FieldLabel>
+    <Input type="tel" name="contact[phone]" id="contact_phone" />
+    {errors?.phone && <FieldError>{errors.phone}</FieldError>}
+  </Field>
+</FieldSet>
+```
+
+#### FieldGroup for Horizontal Layout
+
+```tsx
+import { FieldGroup, Field, FieldLabel } from "@/components/ui/field"
+import { Input } from "@/components/ui/input"
+;<FieldGroup>
+  <Field>
+    <FieldLabel htmlFor="user_first_name">First Name</FieldLabel>
+    <Input name="user[first_name]" id="user_first_name" />
+  </Field>
+
+  <Field>
+    <FieldLabel htmlFor="user_last_name">Last Name</FieldLabel>
+    <Input name="user[last_name]" id="user_last_name" />
+  </Field>
+</FieldGroup>
 ```
 
 ### Complete Form Example
@@ -405,7 +471,13 @@ export default function ItemForm({ item, errors }: Props) {
 </Form>
 ```
 
-**Why:** Card expects direct children (Header → Content → Footer); Form's render function breaks this hierarchy causing styling/semantic issues.
+#### Why This Matters
+
+- **Breaking Card's component structure causes styling and semantic issues**
+- **Card components expect direct children in a specific order** (Header → Content → Footer)
+- **Form's render function creates a new component boundary** that disrupts this hierarchy
+
+**General rule:** Keep component hierarchies intact. If a parent component expects specific children structure (like Card), don't interrupt it with wrapper components like Form.
 
 ### Layout Components
 
@@ -435,6 +507,63 @@ export default function SpecialPage() {
 }
 
 SpecialPage.layout = (page: React.ReactNode) => <CustomLayout children={page} />
+```
+
+### TypeScript Types
+
+#### Page Props Type
+
+```tsx
+type Item = {
+  id: number
+  name: string
+  description: string | null
+  created_at: string
+}
+
+type Props = {
+  item: Item
+  errors?: Record<string, string>
+}
+
+export default function Show({ item, errors }: Props) {
+  // ...
+}
+```
+
+#### Shared Props (from inertia_share)
+
+```tsx
+// Define in types/inertia.d.ts
+declare module "@inertiajs/core" {
+  interface PageProps {
+    auth: {
+      user: {
+        id: number
+        email: string
+        name: string
+      } | null
+    }
+    flash: {
+      notice?: string
+      alert?: string
+    }
+  }
+}
+
+// Access in components
+import { usePage } from "@inertiajs/react"
+
+export default function MyComponent() {
+  const { auth, flash } = usePage().props
+
+  return (
+    <div>
+      {auth.user && <p>Hello, {auth.user.name}</p>}
+      {flash.notice && <div className="notice">{flash.notice}</div>}
+    </div>
+  )
+}
 ```
 
 # Standard CRUD Pattern
@@ -486,7 +615,24 @@ Inherit from `InertiaController`, implement standard actions:
 class ItemsController < InertiaController
   before_action :set_item, only: %i[show edit update destroy]
 
-  # index, show, new, edit: automatic rendering (assign @items/@item, done)
+  def index
+    @items = Item.all.as_json(only: %i[id name created_at])
+    # Automatically renders "items/index" with props: { items: @items }
+    # (explicit render not needed due to default_render: true)
+  end
+
+  def show
+    # Automatically renders "items/show" with props: { item: @item }
+  end
+
+  def new
+    @item = Item.new
+    # Automatically renders "items/new" with props: { item: @item }
+  end
+
+  def edit
+    # Automatically renders "items/edit" with props: { item: @item }
+  end
 
   def create
     @item = Item.new(item_params)
@@ -501,15 +647,36 @@ class ItemsController < InertiaController
     if @item.update(item_params)
       redirect_to items_path, notice: "Item was successfully updated."
     else
-      render inertia: "items/edit", props: { item: @item }.merge(inertia_errors(@item)), status: :unprocessable_content
+      render inertia: "items/edit", props: { item: @item }.merge(inertia_errors(@item)), status: :unprocessable_contents
     end
   end
 
+  def destroy
+    @item.destroy!
+    redirect_to items_path, notice: "Item was successfully deleted."
+  end
+
   private
-  def set_item; @item = Item.find(params[:id]); end
-  def item_params; params.require(:item).permit(:name, :description); end
+
+  def set_item
+    @item = Item.find(params[:id])
+  end
+
+  def item_params
+    params.require(:item).permit(:name, :description)
+  end
 end
 ```
+
+### Key Points
+
+- **Use `inertia_errors(model)`** to format validation errors (returns `{ errors: { field: "message" } }`)
+- **Flash messages** (`:notice`, `:alert`) are automatically shared to frontend
+- **`default_render: true`** enables automatic rendering: assign instance variables (e.g., `@items`), and the matching component renders automatically
+- **Use explicit `render inertia:`** only when:
+  - Passing props via the `props:` hash
+  - Merging errors (`inertia_errors`)
+  - Rendering a different component than the default
 
 ## Frontend Structure
 
@@ -526,11 +693,114 @@ app/frontend/pages/
 
 Controller renders match directory: `render inertia: "items/index"` → `app/frontend/pages/items/index.tsx`
 
-**Key patterns:**
-- Type props: `type Props = { items: Item[], errors?: Record<string, string> }`
-- Use `<Link>` for navigation, `<Form>` with uncontrolled inputs
-- Set layout: `Index.layout = (page) => <PersistentLayout children={page} />`
-- Forms: `<Field>` + `<FieldLabel>` + `<Input name="item[name]">` + `<FieldError>`
+### Example Pages
+
+**index.tsx** - List page:
+
+```tsx
+import { Link } from "@inertiajs/react"
+import PersistentLayout from "@/layouts/PersistentLayout"
+import { Button } from "@/components/ui/button"
+
+type Item = {
+  id: number
+  name: string
+  created_at: string
+}
+
+type Props = {
+  items: Item[]
+}
+
+export default function Index({ items }: Props) {
+  return (
+    <div>
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Items</h1>
+        <Link href="/items/new">
+          <Button>New Item</Button>
+        </Link>
+      </div>
+
+      <div className="space-y-4">
+        {items.map((item) => (
+          <div key={item.id} className="rounded border p-4">
+            <Link href={`/items/${item.id}`}>
+              <h2 className="text-lg font-semibold">{item.name}</h2>
+            </Link>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+Index.layout = (page: React.ReactNode) => <PersistentLayout children={page} />
+```
+
+**new.tsx** - Create form:
+
+```tsx
+import { Form } from "@inertiajs/react"
+import PersistentLayout from "@/layouts/PersistentLayout"
+import { Field, FieldLabel, FieldError } from "@/components/ui/field"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Button } from "@/components/ui/button"
+
+type Props = {
+  item: {
+    name?: string
+    description?: string
+  }
+  errors?: {
+    name?: string
+    description?: string
+  }
+}
+
+export default function New({ item, errors }: Props) {
+  return (
+    <div>
+      <h1 className="mb-6 text-2xl font-bold">New Item</h1>
+
+      <Form action="/items" method="post" resetOnSuccess>
+        {({ processing }) => (
+          <>
+            <Field>
+              <FieldLabel htmlFor="item_name">Name</FieldLabel>
+              <Input
+                name="item[name]"
+                defaultValue={item.name}
+                id="item_name"
+              />
+              {errors?.name && <FieldError>{errors.name}</FieldError>}
+            </Field>
+
+            <Field>
+              <FieldLabel htmlFor="item_description">Description</FieldLabel>
+              <Textarea
+                name="item[description]"
+                defaultValue={item.description}
+                id="item_description"
+              />
+              {errors?.description && (
+                <FieldError>{errors.description}</FieldError>
+              )}
+            </Field>
+
+            <Button type="submit" disabled={processing}>
+              Create Item
+            </Button>
+          </>
+        )}
+      </Form>
+    </div>
+  )
+}
+
+New.layout = (page: React.ReactNode) => <PersistentLayout children={page} />
+```
 
 ### Forms
 
@@ -624,7 +894,34 @@ RSpec.describe "/items", inertia: true do
     end
   end
 
-  # GET /show, /new, /edit: similar pattern (test component + props)
+  describe "GET /show" do
+    it "renders component with item" do
+      item = Item.create!(valid_attributes)
+      get item_path(item)
+
+      expect(inertia).to render_component("items/show")
+      expect(inertia.props[:item]['id']).to eq(item.id)
+    end
+  end
+
+  describe "GET /new" do
+    it "renders new form component" do
+      get new_item_path
+
+      expect(inertia).to render_component("items/new")
+      expect(inertia.props[:item]).to be_present
+    end
+  end
+
+  describe "GET /edit" do
+    it "renders edit form component" do
+      item = Item.create!(valid_attributes)
+      get edit_item_path(item)
+
+      expect(inertia).to render_component("items/edit")
+      expect(inertia.props[:item]['id']).to eq(item.id)
+    end
+  end
 
   describe "POST /items" do
     context "with valid params" do
@@ -649,7 +946,43 @@ RSpec.describe "/items", inertia: true do
     end
   end
 
-  # PATCH, DELETE: test success redirects + model changes
+  describe "PATCH /items/:id" do
+    let(:item) { Item.create!(valid_attributes) }
+    let(:new_attributes) { { name: "Updated Name" } }
+
+    context "with valid params" do
+      it "updates item and redirects" do
+        patch item_path(item), params: { item: new_attributes }
+
+        expect(response).to have_http_status(:found)
+        expect(response).to redirect_to(items_path)
+        expect(item.reload.name).to eq("Updated Name")
+      end
+    end
+
+    context "with invalid params" do
+      it "renders form with errors" do
+        patch item_path(item), params: { item: invalid_attributes }
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(inertia).to render_component("items/edit")
+        expect(inertia.props[:errors][:name]).to be_present
+      end
+    end
+  end
+
+  describe "DELETE /items/:id" do
+    it "destroys item and redirects" do
+      item = Item.create!(valid_attributes)
+
+      expect {
+        delete item_path(item)
+      }.to change(Item, :count).by(-1)
+
+      expect(response).to have_http_status(:found)
+      expect(response).to redirect_to(items_path)
+    end
+  end
 end
 ```
 
@@ -702,7 +1035,29 @@ expect(inertia.props[:auth][:user]['email_address']).to eq('test@example.com')
 expect(inertia.props[:auth][:user][:email_address]).to eq('test@example.com')
 ```
 
-**Remember:** Top-level `inertia_share` keys are symbols; `.as_json()` nested keys are strings. Build hashes manually for symbol keys throughout.
+### Key Access Pattern
+
+- **Top-level `inertia_share` keys**: symbols (`:auth`, `:flash`)
+- **Nested keys from `.as_json()`**: strings (`'email_address'`, `'id'`)
+- **Manually built hashes**: symbols throughout
+
+### Alternative: Manual Hash Building
+
+For symbol keys throughout, build hashes manually:
+
+```ruby
+inertia_share auth: -> {
+  {
+    user: current_user ? {
+      id: current_user.id,
+      email_address: current_user.email_address
+    } : nil
+  }
+}
+
+# Now you can use symbol keys
+expect(inertia.props[:auth][:user][:email_address]).to eq('test@example.com')
+```
 
 ## Props vs View Data
 
@@ -861,4 +1216,22 @@ end
 
 ### Testing with Authentication
 
-See "Testing Signed Cookies" section above for `sign_in` helper setup. Use `before { sign_in(user) }` in specs requiring authentication.
+```ruby
+# spec/rails_helper.rb
+RSpec.configure do |config|
+  config.include SessionHelper, type: :request
+end
+
+# spec/support/session_helper.rb
+module SessionHelper
+  def sign_in(user)
+    post session_path, params: {
+      email_address: user.email_address,
+      password: 'password'
+    }
+  end
+end
+
+# In specs
+before { sign_in(user) }
+```
