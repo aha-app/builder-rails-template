@@ -25,6 +25,8 @@ Rails 8.1 + Inertia.js + React 19 + TypeScript + Vite. Uses shadcn/ui components
 | `npm lint:fix`                         | Fix JS/TS lint issues                                   |
 | `npm format:fix`                       | Format code with Prettier                               |
 
+- `./bin/ci` is the main command to run for tests, linting, and type checking.
+
 ## Inertia.js Essentials
 
 ### Navigation
@@ -54,7 +56,7 @@ end
 def create
   @item = Item.new(item_params)
   unless @item.save
-    render inertia: "items/new", props: { item: @item }.merge(inertia_errors(@item))
+    render inertia: "items/new", props: { item: @item }.merge(inertia_errors(@item)), status: :unprocessable_content
   end
 end
 
@@ -637,7 +639,7 @@ class ItemsController < InertiaController
     if @item.save
       redirect_to items_path, notice: "Item was successfully created."
     else
-      render inertia: "items/new", props: { item: @item }.merge(inertia_errors(@item))
+      render inertia: "items/new", props: { item: @item }.merge(inertia_errors(@item)), status: :unprocessable_content
     end
   end
 
@@ -645,7 +647,7 @@ class ItemsController < InertiaController
     if @item.update(item_params)
       redirect_to items_path, notice: "Item was successfully updated."
     else
-      render inertia: "items/edit", props: { item: @item }.merge(inertia_errors(@item))
+      render inertia: "items/edit", props: { item: @item }.merge(inertia_errors(@item)), status: :unprocessable_contents
     end
   end
 
@@ -855,6 +857,7 @@ RSpec.describe Item do
   describe 'validations' do
     it { should validate_presence_of(:name) }
     it { should validate_length_of(:name).is_at_most(255) }
+    it { should validate_uniqueness_of(:email_address).ignoring_case_sensitivity }
   end
 
   describe 'associations' do
@@ -927,7 +930,7 @@ RSpec.describe "/items", inertia: true do
           post items_path, params: { item: valid_attributes }
         }.to change(Item, :count).by(1)
 
-        expect(response).to have_http_status(:see_other)
+        expect(response).to have_http_status(:found)
         expect(response).to redirect_to(items_path)
       end
     end
@@ -951,7 +954,7 @@ RSpec.describe "/items", inertia: true do
       it "updates item and redirects" do
         patch item_path(item), params: { item: new_attributes }
 
-        expect(response).to have_http_status(:see_other)
+        expect(response).to have_http_status(:found)
         expect(response).to redirect_to(items_path)
         expect(item.reload.name).to eq("Updated Name")
       end
@@ -976,7 +979,7 @@ RSpec.describe "/items", inertia: true do
         delete item_path(item)
       }.to change(Item, :count).by(-1)
 
-      expect(response).to have_http_status(:see_other)
+      expect(response).to have_http_status(:found)
       expect(response).to redirect_to(items_path)
     end
   end
@@ -999,7 +1002,7 @@ Available matchers for testing Inertia responses:
 
 Use the correct status codes for Inertia responses:
 
-- **Success (redirect)**: `:see_other` (303)
+- **Success (redirect)**: `:found` (303)
 - **Validation error**: `:unprocessable_content` (422)
 - **Not found**: `:not_found` (404)
 
@@ -1160,7 +1163,7 @@ describe "POST /items with file upload" do
       item: { name: "Test", attachment: file }
     }
 
-    expect(response).to have_http_status(:see_other)
+    expect(response).to have_http_status(:found)
     expect(Item.last.attachment).to be_attached
   end
 end
