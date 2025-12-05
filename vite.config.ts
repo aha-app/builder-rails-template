@@ -4,13 +4,12 @@ import { defineConfig } from "vite"
 import EnvironmentPlugin from "vite-plugin-environment"
 import ViteRuby from "vite-plugin-ruby"
 
-export default defineConfig(({ mode }) => ({
+export default defineConfig({
   plugins: [
     react({
       babel: {
         plugins: ["babel-plugin-react-compiler"],
       },
-      jsxImportSource: mode === "development" ? "@/lib" : undefined,
     }),
     tailwindcss(),
     ViteRuby(),
@@ -30,4 +29,4 @@ export default defineConfig(({ mode }) => ({
       },
     },
   },
-}))
+})
