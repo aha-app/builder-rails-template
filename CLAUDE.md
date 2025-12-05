@@ -414,21 +414,9 @@ export default function ItemForm({ item, errors }: Props) {
 
 #### PersistentLayout
 
-Used for pages that share navigation/header:
+The persistent layout wraps all pages by default.
 
-```tsx
-import PersistentLayout from "@/layouts/persistent-layout"
-
-export default function Index({ items }) {
-  return <div>{/* page content */}</div>
-}
-
-Index.layout = (page: React.ReactNode) => (
-  <PersistentLayout>{page}</PersistentLayout>
-)
-```
-
-How to implement `PersistentLayout` with header and footer:
+How to update `PersistentLayout` with header and footer:
 
 ```tsx
 // PersistentLayout
@@ -440,7 +428,7 @@ export default function PersistentLayout({ children }) {
       <header className="bg-background border-b">
         <div className="h-16 ... ...">...</div>
       </header>
-      <main className="flex-1">{children}</main>{" "}
+      <main className="flex flex-1">{children}</main>{" "}
       {/* flex-1 takes remaining space */}
       <Toaster richColors />
     </div>
