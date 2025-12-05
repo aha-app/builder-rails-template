@@ -428,7 +428,9 @@ export default function Index({ items }) {
   return <div>{/* page content */}</div>
 }
 
-Index.layout = (page: React.ReactNode) => <PersistentLayout children={page} />
+Index.layout = (page: React.ReactNode) => (
+  <PersistentLayout>{page}</PersistentLayout>
+)
 ```
 
 #### Custom Per-Page Layout
@@ -442,7 +444,9 @@ export default function SpecialPage() {
   return <div>{/* page content */}</div>
 }
 
-SpecialPage.layout = (page: React.ReactNode) => <CustomLayout children={page} />
+SpecialPage.layout = (page: React.ReactNode) => (
+  <CustomLayout>{page}</CustomLayout>
+)
 ```
 
 ### TypeScript Types
@@ -671,7 +675,9 @@ export default function Index({ items }: Props) {
   )
 }
 
-Index.layout = (page: React.ReactNode) => <PersistentLayout children={page} />
+Index.layout = (page: React.ReactNode) => (
+  <PersistentLayout>{page}</PersistentLayout>
+)
 ```
 
 **new.tsx** - Create form:
@@ -735,7 +741,9 @@ export default function New({ item, errors }: Props) {
   )
 }
 
-New.layout = (page: React.ReactNode) => <PersistentLayout children={page} />
+New.layout = (page: React.ReactNode) => (
+  <PersistentLayout>{page}</PersistentLayout>
+)
 ```
 
 ### Forms
