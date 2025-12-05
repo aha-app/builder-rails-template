@@ -8,9 +8,9 @@ interface PersistentLayoutProps {
 
 export default function PersistentLayout({ children }: PersistentLayoutProps) {
   return (
-    <>
+    <div className="flex min-h-screen flex-col">
       {children}
       <Toaster richColors />
-    </>
+    </div>
   )
 }

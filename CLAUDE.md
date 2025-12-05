@@ -428,6 +428,26 @@ Index.layout = (page: React.ReactNode) => (
 )
 ```
 
+How to implement `PersistentLayout` with header and footer:
+
+```tsx
+// PersistentLayout
+export default function PersistentLayout({ children }) {
+  return (
+    <div className="flex min-h-screen flex-col">
+      {" "}
+      {/* Use min-h-screen ONCE here */}
+      <header className="bg-background border-b">
+        <div className="h-16 ... ...">...</div>
+      </header>
+      <main className="flex-1">{children}</main>{" "}
+      {/* flex-1 takes remaining space */}
+      <Toaster richColors />
+    </div>
+  )
+}
+```
+
 #### Custom Per-Page Layout
 
 Override the layout for specific pages:
