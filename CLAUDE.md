@@ -6,6 +6,11 @@ This is a Rails 8 application template using Inertia.js with React. It is a gree
 
 Rails 8.1 + Inertia.js + React 19 + TypeScript + Vite. Uses shadcn/ui components, Tailwind CSS v4, and JS-Routes for type-safe routing (`import { rootPath } from "@/routes"`). Database-backed infrastructure: Solid Cache/Queue/Cable.
 
+### General Rules
+
+- Early development, no users. No backwards compatibility concerns. Do things RIGHT: clean, organized, zero tech debt. Never create compatibility shims.
+- WE NEVER WANT WORKAROUNDS, we always want FULL implementations that are long term sustainable for many >1000 users. so dont come up with half baked solutions
+
 ## Frontend Structure
 
 - **Entry**: `app/frontend/entrypoints/inertia.ts`
