@@ -1,5 +1,4 @@
 class InertiaController < ApplicationController
-  inertia_config default_render: true
   inertia_share flash: -> { flash.to_hash }
 
   private

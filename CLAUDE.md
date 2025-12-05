@@ -41,37 +41,27 @@ Rails 8.1 + Inertia.js + React 19 + TypeScript + Vite. Uses shadcn/ui components
 
 ### Rendering Behavior
 
-`InertiaController` enables `inertia_config default_render: true` for automatic component rendering.
-
-**Automatic rendering** (use this by default):
+**Always use explicit `render inertia:` calls** to avoid security risks from accidentally leaking sensitive data.
 
 ```ruby
 class ItemsController < InertiaController
   def index
-    @items = Item.all.as_json(only: %i[id name])
-    # Auto-renders "items/index" with props: { items: @items }
+    items = Item.all.as_json(only: %i[id name])
+    render inertia: "items/index", props: { items: items }
+  end
+
+  def create
+    item = Item.new(item_params)
+    if item.save
+      redirect_to items_path, notice: "Item was successfully created."
+    else
+      render inertia: "items/new", props: { item: item }.merge(inertia_errors(item)), status: :unprocessable_content
+    end
   end
 end
 ```
 
-**Explicit rendering** (when needed):
-
-```ruby
-# 1. Merging additional props (e.g., validation errors)
-def create
-  @item = Item.new(item_params)
-  unless @item.save
-    render inertia: "items/new", props: { item: @item }.merge(inertia_errors(@item)), status: :unprocessable_content
-  end
-end
-
-# 2. Rendering different component
-def special_view
-  render inertia: "items/custom_view"
-end
-```
-
-**Rule:** Use explicit `render inertia:` only when passing props via `props:` hash, merging errors, or rendering a different component. Otherwise, let automatic rendering handle it.
+**Key principle:** Explicitly specify which data to pass as props. This prevents accidentally exposing instance variables like `@current_user`, memoized variables, or internal state to the frontend.
 
 ### Shared Data
 
@@ -561,30 +551,31 @@ class ItemsController < InertiaController
   before_action :set_item, only: %i[show edit update destroy]
 
   def index
-    @items = Item.all.as_json(only: %i[id name created_at])
-    # Automatically renders "items/index" with props: { items: @items }
-    # (explicit render not needed due to default_render: true)
+    items = Item.all.as_json(only: %i[id name created_at])
+    render inertia: "items/index", props: { items: items }
   end
 
   def show
-    # Automatically renders "items/show" with props: { item: @item }
+    item = @item.as_json(only: %i[id name description created_at])
+    render inertia: "items/show", props: { item: item }
   end
 
   def new
-    @item = Item.new
-    # Automatically renders "items/new" with props: { item: @item }
+    item = Item.new.as_json(only: %i[name description])
+    render inertia: "items/new", props: { item: item }
   end
 
   def edit
-    # Automatically renders "items/edit" with props: { item: @item }
+    item = @item.as_json(only: %i[id name description])
+    render inertia: "items/edit", props: { item: item }
   end
 
   def create
-    @item = Item.new(item_params)
-    if @item.save
+    item = Item.new(item_params)
+    if item.save
       redirect_to items_path, notice: "Item was successfully created."
     else
-      render inertia: "items/new", props: { item: @item }.merge(inertia_errors(@item)), status: :unprocessable_content
+      render inertia: "items/new", props: { item: item }.merge(inertia_errors(item)), status: :unprocessable_content
     end
   end
 
@@ -592,7 +583,7 @@ class ItemsController < InertiaController
     if @item.update(item_params)
       redirect_to items_path, notice: "Item was successfully updated."
     else
-      render inertia: "items/edit", props: { item: @item }.merge(inertia_errors(@item)), status: :unprocessable_contents
+      render inertia: "items/edit", props: { item: @item }.merge(inertia_errors(@item)), status: :unprocessable_content
     end
   end
 
@@ -615,13 +606,11 @@ end
 
 ### Key Points
 
+- **Always use explicit `render inertia:`** calls with explicitly defined props to avoid security risks
 - **Use `inertia_errors(model)`** to format validation errors (returns `{ errors: { field: "message" } }`)
 - **Flash messages** (`:notice`, `:alert`) are automatically shared to frontend
-- **`default_render: true`** enables automatic rendering: assign instance variables (e.g., `@items`), and the matching component renders automatically
-- **Use explicit `render inertia:`** only when:
-  - Passing props via the `props:` hash
-  - Merging errors (`inertia_errors`)
-  - Rendering a different component than the default
+- **Explicitly serialize props** using `.as_json()` to control exactly what data is sent to the client
+- **Never rely on instance variables** being automatically serialized - this can accidentally leak sensitive data
 
 ## Frontend Structure
 
@@ -762,19 +751,25 @@ Follow existing `<Form>` preferences from main docs:
 
 ### Props Serialization
 
-Send only what the page needs:
+**Security-first approach:** Only serialize and send exactly what the page needs. Never serialize entire models.
 
 ```ruby
-# Minimal serialization
-@items = Item.all.as_json(only: %i[id name created_at])
+# ✅ CORRECT - Minimal serialization with explicit fields
+items = Item.all.as_json(only: %i[id name created_at])
+render inertia: "items/index", props: { items: items }
 
-# With associations
-@item = @item.as_json(
+# ✅ CORRECT - With associations, explicitly specify fields
+item = Item.find(params[:id]).as_json(
   only: %i[id name description],
   include: {
     author: { only: %i[id name] }
   }
 )
+render inertia: "items/show", props: { item: item }
+
+# ❌ WRONG - Serializes all attributes including sensitive data
+item = Item.find(params[:id]).as_json
+render inertia: "items/show", props: { item: item }
 ```
 
 ## When to Deviate
