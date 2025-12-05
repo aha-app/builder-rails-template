@@ -1,16 +1,17 @@
-import type { ReactNode } from 'react';
+import type { ReactNode } from "react"
+import { Fragment } from "react"
 
-import { Toaster } from '@/components/ui/sonner';
+import { Toaster } from "@/components/ui/sonner"
 
 interface PersistentLayoutProps {
-	children: ReactNode;
+  children: ReactNode
 }
 
 export default function PersistentLayout({ children }: PersistentLayoutProps) {
-	return (
-		<>
-			{children}
-			<Toaster richColors />
-		</>
-	);
+  return (
+    <Fragment>
+      {children}
+      <Toaster richColors />
+    </Fragment>
+  )
 }

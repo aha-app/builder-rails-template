@@ -422,7 +422,7 @@ export default function ItemForm({ item, errors }: Props) {
 Used for pages that share navigation/header:
 
 ```tsx
-import PersistentLayout from "@/layouts/PersistentLayout"
+import PersistentLayout from "@/layouts/persistent-layout"
 
 export default function Index({ items }) {
   return <div>{/* page content */}</div>
@@ -436,7 +436,7 @@ Index.layout = (page: React.ReactNode) => <PersistentLayout children={page} />
 Override the layout for specific pages:
 
 ```tsx
-import CustomLayout from "@/layouts/CustomLayout"
+import CustomLayout from "@/layouts/custom-layout"
 
 export default function SpecialPage() {
   return <div>{/* page content */}</div>
@@ -635,7 +635,7 @@ Controller renders match directory: `render inertia: "items/index"` → `app/fro
 
 ```tsx
 import { Link } from "@inertiajs/react"
-import PersistentLayout from "@/layouts/PersistentLayout"
+import PersistentLayout from "@/layouts/persistent-layout"
 import { Button } from "@/components/ui/button"
 
 type Item = {
@@ -678,7 +678,7 @@ Index.layout = (page: React.ReactNode) => <PersistentLayout children={page} />
 
 ```tsx
 import { Form } from "@inertiajs/react"
-import PersistentLayout from "@/layouts/PersistentLayout"
+import PersistentLayout from "@/layouts/persistent-layout"
 import { Field, FieldLabel, FieldError } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
