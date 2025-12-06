@@ -423,13 +423,10 @@ How to update `PersistentLayout` with header and footer:
 export default function PersistentLayout({ children }) {
   return (
     <div className="flex min-h-screen flex-col">
-      {" "}
-      {/* Use min-h-screen ONCE here */}
       <header className="bg-background border-b">
         <div className="h-16 ... ...">...</div>
       </header>
-      <main className="flex flex-1">{children}</main>{" "}
-      {/* flex-1 takes remaining space */}
+      <main className="flex flex-1">{children}</main>
       <Toaster richColors />
     </div>
   )
@@ -450,6 +447,41 @@ export default function SpecialPage() {
 SpecialPage.layout = (page: React.ReactNode) => (
   <CustomLayout>{page}</CustomLayout>
 )
+```
+
+#### Page Components
+
+**Pages render inside the PersistentLayout's `<main>` element. Never use `min-h-screen` in pages.**
+
+```tsx
+// ❌ WRONG - Nested min-h-screen
+export default function ItemsIndex() {
+  return (
+    <div className="min-h-screen p-6">
+      {" "}
+      {/* Don't do this! */}
+      <h1>Items</h1>
+    </div>
+  )
+}
+
+// ✅ CORRECT - Use flex-1 to fill available space
+export default function ItemsIndex() {
+  return (
+    <div className="flex flex-1 flex-col p-6">
+      <h1>Items</h1>
+    </div>
+  )
+}
+
+// ✅ CORRECT - Centered content page
+export default function SignIn() {
+  return (
+    <div className="flex flex-1 items-center justify-center p-4">
+      <Card>...</Card>
+    </div>
+  )
+}
 ```
 
 ### TypeScript Types
@@ -641,7 +673,6 @@ Controller renders match directory: `render inertia: "items/index"` → `app/fro
 
 ```tsx
 import { Link } from "@inertiajs/react"
-import PersistentLayout from "@/layouts/persistent-layout"
 import { Button } from "@/components/ui/button"
 
 type Item = {
@@ -676,17 +707,12 @@ export default function Index({ items }: Props) {
     </div>
   )
 }
-
-Index.layout = (page: React.ReactNode) => (
-  <PersistentLayout>{page}</PersistentLayout>
-)
 ```
 
 **new.tsx** - Create form:
 
 ```tsx
 import { Form } from "@inertiajs/react"
-import PersistentLayout from "@/layouts/persistent-layout"
 import { Field, FieldLabel, FieldError } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -742,10 +768,6 @@ export default function New({ item, errors }: Props) {
     </div>
   )
 }
-
-New.layout = (page: React.ReactNode) => (
-  <PersistentLayout>{page}</PersistentLayout>
-)
 ```
 
 ### Forms
