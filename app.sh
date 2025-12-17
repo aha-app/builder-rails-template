@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+export NODE_ENV=development
+export RAILS_ENV=development
+
 # Ensure configuration is up to date
 bundle install
 npm install
