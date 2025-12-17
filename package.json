@@ -77,6 +77,7 @@
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.app.json && tsc -p tsconfig.node.json",
+    "type-check": "npm run typecheck",
     "lint": "eslint '*.{js,mjs,cjs,ts}' app/frontend --report-unused-disable-directives --max-warnings 0",
     "lint:fix": "npm run lint -- --fix",
     "format": "prettier --check 'app/frontend' '*.{js,mjs,cjs,ts}'",
