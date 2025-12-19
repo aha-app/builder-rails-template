@@ -4,7 +4,7 @@ This is a Rails 8 application template using Inertia.js with React. It is a gree
 
 ## Stack
 
-Rails 8.1 + Inertia.js + React 19 + TypeScript + Vite. Uses shadcn/ui components, Tailwind CSS v4, and JS-Routes for type-safe routing (`import { rootPath } from "@/routes"`). Database-backed infrastructure: Solid Cache/Queue/Cable.
+Rails 8.1 + Inertia.js + React 19 + TypeScript + Vite. Uses shadcn/ui components, Tailwind CSS v4, and JS-Routes for typed routing (`import { rootPath } from "@/routes"`). Database-backed infrastructure: Solid Cache/Queue/Cable.
 
 ### General Rules
 
@@ -29,6 +29,7 @@ Rails 8.1 + Inertia.js + React 19 + TypeScript + Vite. Uses shadcn/ui components
 | `./bin/rails js:routes`                | Generate TypeScript route definitions                      |
 | `npm lint:fix`                         | Fix JS/TS lint issues                                      |
 | `npm format:fix`                       | Format code with Prettier                                  |
+| `npm typecheck`                        | Run TypeScript type checking                               |
 
 - `./bin/ci` is the main command to run for tests, linting, and type checking.
 
@@ -90,8 +91,6 @@ render inertia: 'posts/show', props: {
 
 **Deferred props:** `stats: InertiaRails.defer { expensive_calculation }` loads after initial render. Group with `group: 'name'` for parallel fetching.
 
-**Lazy loading:** Remove `{ eager: true }` from `import.meta.glob('../pages/**/*.tsx')` for code splitting (large apps only).
-
 ## Forms
 
 **Prefer `<Form>` over `useForm`** - handles 90% of cases.
@@ -106,11 +105,11 @@ export default () => (
   <Form action="/users" method="post" resetOnSuccess>
     {({ errors, processing }) => (
       <>
-        <input name="name" defaultValue="John" />
+        <input name="user.name" defaultValue="John" />
         {errors.name && <div>{errors.name}</div>}
 
         <input name="user.skills[]" />
-        <input type="file" name="avatar" />
+        <input type="file" name="user.avatar" />
 
         <button disabled={processing}>Submit</button>
       </>
@@ -125,7 +124,7 @@ export default () => (
 - Use `defaultValue` for initial values
 - Use `resetOnSuccess` to clear form after submission
 - Access reactive state via slot props: `errors`, `processing`, `isDirty`, `wasSuccessful`
-- Automatically handles nested data (`report[description]`), arrays (`tags[]`), file uploads
+- Automatically handles nested data (`report.description`), arrays (`report.tags[]`), file uploads
 
 **When to use `useForm` instead:**
 
@@ -140,7 +139,7 @@ Use method spoofing (multipart doesn't support PUT/PATCH natively):
 ```tsx
 <Form action="/users/1" method="post">
   <input type="hidden" name="_method" value="put" />
-  <input type="file" name="avatar" />
+  <input type="file" name="user.avatar" />
 </Form>
 ```
 
@@ -252,7 +251,7 @@ import { Field, FieldLabel, FieldError } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 ;<Field>
   <FieldLabel htmlFor="item_name">Name</FieldLabel>
-  <Input name="item[name]" defaultValue={item.name} id="item_name" />
+  <Input name="item.name" defaultValue={item.name} id="item_name" />
   {errors?.name && <FieldError>{errors.name}</FieldError>}
 </Field>
 ```
@@ -291,7 +290,7 @@ export default function ItemForm({ item, errors }: Props) {
         <div className="space-y-6">
           <Field>
             <FieldLabel htmlFor="item_name">Name</FieldLabel>
-            <Input name="item[name]" defaultValue={item.name} id="item_name" />
+            <Input name="item.name" defaultValue={item.name} id="item_name" />
             {errors?.name && <FieldError>{errors.name}</FieldError>}
           </Field>
 
@@ -301,7 +300,7 @@ export default function ItemForm({ item, errors }: Props) {
               Provide a detailed description of the item
             </FieldDescription>
             <Textarea
-              name="item[description]"
+              name="item.description"
               defaultValue={item.description}
               id="item_description"
             />
@@ -314,7 +313,7 @@ export default function ItemForm({ item, errors }: Props) {
             <FieldLabel htmlFor="item_price">Price</FieldLabel>
             <Input
               type="number"
-              name="item[price]"
+              name="item.price"
               defaultValue={item.price}
               step="0.01"
               id="item_price"
@@ -740,7 +739,7 @@ export default function New({ item, errors }: Props) {
             <Field>
               <FieldLabel htmlFor="item_name">Name</FieldLabel>
               <Input
-                name="item[name]"
+                name="item.name"
                 defaultValue={item.name}
                 id="item_name"
               />
@@ -750,7 +749,7 @@ export default function New({ item, errors }: Props) {
             <Field>
               <FieldLabel htmlFor="item_description">Description</FieldLabel>
               <Textarea
-                name="item[description]"
+                name="item.description"
                 defaultValue={item.description}
                 id="item_description"
               />
