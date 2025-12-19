@@ -8,10 +8,7 @@ development:
   database: builder_application_development
 
 test:
-  url: sqlite3:storage/test.sqlite3
-  adapter: sqlite3
-  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-  timeout: 5000
+  url: <%= ENV["TEST_DATABASE_URL"] %>
 
 production:
   url: <%= ENV["DATABASE_URL"] %>
