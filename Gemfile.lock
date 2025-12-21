@@ -75,6 +75,11 @@ GEM
       securerandom (>= 0.3)
       tzinfo (~> 2.0, >= 2.0.5)
       uri (>= 0.13.1)
+    aha_builder_core (1.0.0)
+      concurrent-ruby (>= 1.0, < 2.0)
+      faraday (>= 1.0, < 3.0)
+      faraday-retry (>= 1.0, < 3.0)
+      jwt (>= 2.0, < 3.0)
     annotaterb (4.20.0)
       activerecord (>= 6.0.0)
       activesupport (>= 6.0.0)
@@ -110,6 +115,14 @@ GEM
     factory_bot_rails (6.5.1)
       factory_bot (~> 6.5)
       railties (>= 6.1.0)
+    faraday (2.14.0)
+      faraday-net_http (>= 2.0, < 3.5)
+      json
+      logger
+    faraday-net_http (3.4.2)
+      net-http (~> 0.5)
+    faraday-retry (2.3.2)
+      faraday (~> 2.0)
     ffi (1.17.2-aarch64-linux-gnu)
     ffi (1.17.2-aarch64-linux-musl)
     ffi (1.17.2-arm-linux-gnu)
@@ -142,6 +155,8 @@ GEM
       railties (>= 5)
       sorbet-runtime
     json (2.16.0)
+    jwt (2.10.2)
+      base64
     language_server-protocol (3.17.0.5)
     lint_roller (1.1.0)
     logger (1.7.0)
@@ -161,6 +176,8 @@ GEM
     minitest (5.26.2)
     msgpack (1.8.0)
     mutex_m (0.3.0)
+    net-http (0.9.1)
+      uri (>= 0.11.1)
     net-imap (0.5.12)
       date
       net-protocol
@@ -383,6 +400,7 @@ PLATFORMS
   x86_64-linux-musl
 
 DEPENDENCIES
+  aha_builder_core
   annotaterb
   bcrypt (~> 3.1.7)
   bootsnap
