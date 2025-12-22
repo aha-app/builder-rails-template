@@ -27,3 +27,7 @@ group :development do
   gem "web-console"
   gem "annotaterb"
 end
+
+group :test do
+  gem "sqlite3", ">= 2.1"
+end
