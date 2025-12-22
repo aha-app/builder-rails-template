@@ -15,6 +15,7 @@ gem "image_processing", "~> 1.2"
 gem "inertia_rails", "~> 3.14"
 gem "vite_rails", "~> 3.0"
 gem "js-routes"
+gem "aha_builder_core"
 
 group :development, :test do
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
