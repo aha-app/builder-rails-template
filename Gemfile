@@ -30,5 +30,6 @@ group :development do
 end
 
 group :test do
+  gem "minitest", "~> 5.27"
   gem "sqlite3", ">= 2.1"
 end
