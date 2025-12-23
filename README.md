@@ -25,7 +25,7 @@ Rails 8.1 + Inertia.js + React 19 + TypeScript + Vite. Uses shadcn/ui components
 | Command                                | Purpose                                                    |
 | -------------------------------------- | ---------------------------------------------------------- |
 | `./bin/ci`                             | Run all checks (Minitest, Rubocop, TS/JS lint, type check) |
-| `bin/rails test`                       | Run Minitest test suite                                    |
+| `bin/rails test -q`                    | Run Minitest test suite                                    |
 | `./bin/rails generate model/migration` | Generate models/migrations                                 |
 | `./bin/rails js:routes`                | Generate TypeScript route definitions                      |
 | `npm lint:fix`                         | Fix JS/TS lint issues                                      |

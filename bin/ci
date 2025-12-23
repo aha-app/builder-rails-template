@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -e
-bin/rails test
+bin/rails test -q
 bundle exec rubocop -A
 npm run lint:fix
 npm run typecheck
