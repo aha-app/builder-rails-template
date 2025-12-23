@@ -103,7 +103,7 @@ import { Form } from "@inertiajs/react"
 
 // ✅ CORRECT: Uncontrolled form with resetOnSuccess
 export default () => (
-  <Form action="/users" method="post" resetOnSuccess>
+  <Form action="/users" method="patch" resetOnSuccess>
     {({ errors, processing }) => (
       <>
         <input name="user.name" defaultValue="John" />
@@ -126,6 +126,7 @@ export default () => (
 - Use `resetOnSuccess` to clear form after submission
 - Access reactive state via slot props: `errors`, `processing`, `isDirty`, `wasSuccessful`
 - Automatically handles nested data (`report.description`), arrays (`report.tags[]`), file uploads
+- Use the `method` prop for RESTful verbs (`post`, `patch`, `delete`) not a hidden `_method` input
 
 **When to use `useForm` instead:**
 
