@@ -10,6 +10,7 @@ Rails 8.1 + Inertia.js + React 19 + TypeScript + Vite. Uses shadcn/ui components
 
 - Early development, no users. No backwards compatibility concerns. Do things RIGHT: clean, organized, zero tech debt. Never create compatibility shims.
 - WE NEVER WANT WORKAROUNDS, we always want FULL implementations that are long term sustainable for many >1000 users. so dont come up with half baked solutions
+- We want thin controllers, fat models/services. All business logic in models/services with unit tests. No controller/integration tests.
 
 ## Frontend Structure
 
@@ -738,11 +739,7 @@ export default function New({ item, errors }: Props) {
           <>
             <Field>
               <FieldLabel htmlFor="item_name">Name</FieldLabel>
-              <Input
-                name="item.name"
-                defaultValue={item.name}
-                id="item_name"
-              />
+              <Input name="item.name" defaultValue={item.name} id="item_name" />
               {errors?.name && <FieldError>{errors.name}</FieldError>}
             </Field>
 
@@ -815,6 +812,7 @@ This project uses **Minitest** (not RSpec).
 ## Testing Strategy
 
 - **Only write unit tests** (model tests). Do NOT write controller/integration tests for Inertia controllers.
+- Delete controller or integration test files if they are generated.
 - **Always use fixtures** over factories.
 - Test files go in `test/models/`.
 
