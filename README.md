@@ -156,6 +156,37 @@ end
 
 Use `inertia_errors(model)` helper for validation errors (returns `{ errors: { field: "message" } }`).
 
+### Response Requirements
+
+**CRITICAL:** Inertia.js requires a full response from every controller action. You cannot use `head :ok` or similar status-only responses.
+
+```ruby
+# ❌ WRONG - Inertia cannot handle status-only responses
+def reorder
+  @item.update_position(params[:position])
+  head :ok  # This will cause Inertia errors
+end
+
+# ✅ CORRECT - Use redirect or render inertia
+def reorder
+  @item.update_position(params[:position])
+  redirect_back fallback_location: items_path
+end
+
+# ✅ ALSO CORRECT - Render Inertia page
+def reorder
+  @item.update_position(params[:position])
+  render inertia: "items/index", props: { items: Item.all.as_json }
+end
+```
+
+**Why:** Inertia intercepts all responses and expects either:
+
+- A redirect (`redirect_to`, `redirect_back`)
+- An Inertia page render (`render inertia:`)
+
+Status-only responses like `head :ok`, `head :no_content`, or `render json:` will break the frontend navigation flow.
+
 ## Component Patterns
 
 This guide covers shadcn/ui component patterns and common import mistakes.
