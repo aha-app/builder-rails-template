@@ -28,14 +28,12 @@ Rails 8.1 + Inertia.js + React 19 + TypeScript + Vite. Uses shadcn/ui components
 | `bin/rails test`                       | Run Minitest test suite                                    |
 | `./bin/rails generate model/migration` | Generate models/migrations                                 |
 | `./bin/rails g inertia:scaffold Model` | Generate full CRUD with Inertia (controller, model, pages) |
-| `./bin/rails js:routes`                | Generate TypeScript route definitions                      |
 | `npm lint:fix`                         | Fix JS/TS lint issues                                      |
 | `npm format:fix`                       | Format code with Prettier                                  |
 | `npm typecheck`                        | Run TypeScript type checking                               |
 | `npm test`                             | Run frontend tests with Vitest                             |
 
 - `./bin/ci` is the main command to run for tests, linting, and type checking.
-- `./bin/rails js:routes` is automatically ran when you edit `config/routes.rb`.
 
 ## Inertia.js Essentials
 
