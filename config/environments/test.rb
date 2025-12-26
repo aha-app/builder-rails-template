@@ -48,6 +48,9 @@ Rails.application.configure do
   # Annotate rendered view with file names.
   # config.action_view.annotate_rendered_view_with_filenames = true
 
+  # Filter out gems from backtraces.
+  Rails.backtrace_cleaner.add_silencer { |line| line =~ /gems/ }
+
   # Raise error when a before_action's only/except options reference missing actions.
   config.action_controller.raise_on_missing_callback_actions = true
 end
