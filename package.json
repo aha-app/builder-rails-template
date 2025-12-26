@@ -88,6 +88,6 @@
     "lint:fix": "npm run lint -- --fix",
     "format": "prettier --check 'app/frontend' '*.{js,mjs,cjs,ts}'",
     "format:fix": "npm run format -- --write",
-    "test": "vitest run --reporter=dot --passWithNoTests"
+    "test": "vitest run --reporter=dot --no-color --passWithNoTests"
   }
 }

@@ -55,10 +55,13 @@ Rails.application.configure do
   config.active_record.migration_error = :page_load
 
   # Highlight code that triggered database queries in logs.
-  config.active_record.verbose_query_logs = true
+  config.active_record.verbose_query_logs = false
+
+  # Disable colorized logging to reduce token usage in log files
+  config.colorize_logging = false
 
   # Append comments with runtime information tags to SQL queries in logs.
-  config.active_record.query_log_tags_enabled = true
+  config.active_record.query_log_tags_enabled = false
 
   # Highlight code that enqueued background job in logs.
   config.active_job.verbose_enqueue_logs = true
@@ -89,4 +92,8 @@ Rails.application.configure do
 
   # Replace the default in-process and non-durable queuing backend for Active Job.
   config.active_job.queue_adapter = :solid_queue
+
+  # Silence SolidQueue heartbeat logs to reduce log noise
+  config.solid_queue.silence_heartbeats = true
+  config.solid_queue.silence_polling = true
 end

@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 set -e
-bin/rails test
-bundle exec rubocop -A
+export CI=true
+export NO_COLOR=1
+export RAILS_ENV=test
+bin/rails test --no-color
+bundle exec rubocop -A --no-color
 npm run lint:fix
 npm run typecheck
 npm run test
