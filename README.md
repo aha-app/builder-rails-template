@@ -32,6 +32,7 @@ Rails 8.1 + Inertia.js + React 19 + TypeScript + Vite. Uses shadcn/ui components
 | `npm lint:fix`                         | Fix JS/TS lint issues                                      |
 | `npm format:fix`                       | Format code with Prettier                                  |
 | `npm typecheck`                        | Run TypeScript type checking                               |
+| `npm test`                             | Run frontend tests with Vitest                             |
 
 - `./bin/ci` is the main command to run for tests, linting, and type checking.
 - `./bin/rails js:routes` is automatically ran when you edit `config/routes.rb`.
@@ -62,23 +63,23 @@ itemPath(1)
 // => "/items/1"
 
 // Format option
-itemPath(1, { format: 'json' })
+itemPath(1, { format: "json" })
 // => "/items/1.json"
 
 // Anchor links
-itemPath(1, { anchor: 'details' })
+itemPath(1, { anchor: "details" })
 // => "/items/1#details"
 
 // Query parameters (single values)
-itemsPath({ q: 'search', status: 'active' })
+itemsPath({ q: "search", status: "active" })
 // => "/items?q=search&status=active"
 
 // Query parameters (arrays) - automatically encoded
-itemsPath({ tags: ['featured', 'new'] })
+itemsPath({ tags: ["featured", "new"] })
 // => "/items?tags%5B%5D=featured&tags%5B%5D=new"
 
 // Combining ID with query parameters
-itemPath(1, { tab: 'history', expanded: true })
+itemPath(1, { tab: "history", expanded: true })
 // => "/items/1?tab=history&expanded=true"
 
 // Objects with id property (automatically extracts ID)
@@ -924,7 +925,7 @@ render inertia: "items/show", props: { item: item }
 
 # Testing Guide
 
-This project uses **Minitest** (not RSpec).
+This project uses **Minitest** (not RSpec) and frontend tests use **Vitest** with React Testing Library. Place test files as `*.test.tsx` alongside components in `app/frontend/`.
 
 ## Testing Strategy
 
