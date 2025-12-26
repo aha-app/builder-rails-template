@@ -929,19 +929,25 @@ This project uses **Minitest** (not RSpec) and frontend tests use **Vitest** wit
 
 ## Testing Strategy
 
-- **Only write unit tests** (model tests). Do NOT write controller/integration tests for Inertia controllers.
-- Delete controller or integration test files if they are generated.
+- **Only write unit tests** (model tests) for business logic
+- **Exception: Write controller tests for non-Inertia responses:**
+  - Export/download actions that stream files
+  - API endpoints that return JSON
+  - Any action that uses `send_data`, `send_file`, or custom headers
+  - Actions that don't render Inertia or redirect
+- Delete controller or integration test files if they are generated and are not needed.
 - **Always use fixtures** over factories.
 - Test files go in `test/models/`.
 
-### Why No Controller/Integration Tests?
+### Why the Exception?
 
-Integration tests for Inertia controllers provide minimal value:
+For standard Inertia actions, controller tests provide minimal value because they test plumbing. But for exports/downloads:
 
-- They test Rails + Inertia plumbing, not your business logic
-- The actual rendering happens in React, which these tests don't verify
-- They're slow and brittle compared to model tests
-- Business logic belongs in models/services where it can be unit tested
+- The HTTP response structure IS the feature
+- Binary data streaming can't be verified visually
+- Content-Type, Content-Disposition headers must be correct
+- File downloads aren't reliably testable in browser automation
+- Integration between params → service → response needs validation
 
 **Put logic in models and test it there.** Controllers should be thin—just coordination between models and Inertia responses.
 
