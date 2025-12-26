@@ -34,6 +34,7 @@ Rails 8.1 + Inertia.js + React 19 + TypeScript + Vite. Uses shadcn/ui components
 | `npm typecheck`                        | Run TypeScript type checking                               |
 
 - `./bin/ci` is the main command to run for tests, linting, and type checking.
+- `./bin/rails js:routes` is automatically ran when you edit `config/routes.rb`.
 
 ## Inertia.js Essentials
 
@@ -237,6 +238,22 @@ import { Input } from "@/components/ui/input"
 - `Input` from `@/components/ui/input`
 - `Textarea` from `@/components/ui/textarea`
 - `Select` from `@/components/ui/select`
+
+#### Select Accessibility
+
+Put `id` on `SelectTrigger` (not `Select`) and match with label's `htmlFor`:
+
+```tsx
+<label htmlFor="filter_by_asset">Filter by Asset</label>
+<Select value={value} onValueChange={setValue}>
+  <SelectTrigger id="filter_by_asset">
+    <SelectValue placeholder="All assets" />
+  </SelectTrigger>
+  <SelectContent>
+    <SelectItem value="all">All assets</SelectItem>
+  </SelectContent>
+</Select>
+```
 
 ### Empty State Pattern
 
