@@ -43,6 +43,73 @@ Rails 8.1 + Inertia.js + React 19 + TypeScript + Vite. Uses shadcn/ui components
 - **Standard**: `<Link href="/path">`
 - **Programmatic**: `router.visit('/path')` (for callbacks, conditionals)
 
+### Routing with JS-Routes
+
+**Always use js-routes helpers** - they provide type-safe, Rails-consistent routing with automatic parameter handling.
+
+```typescript
+import { itemsPath, itemPath, newItemPath } from "@/routes"
+
+// Basic paths (no parameters)
+itemsPath()
+// => "/items"
+
+newItemPath()
+// => "/items/new"
+
+// ID parameters
+itemPath(1)
+// => "/items/1"
+
+// Format option
+itemPath(1, { format: 'json' })
+// => "/items/1.json"
+
+// Anchor links
+itemPath(1, { anchor: 'details' })
+// => "/items/1#details"
+
+// Query parameters (single values)
+itemsPath({ q: 'search', status: 'active' })
+// => "/items?q=search&status=active"
+
+// Query parameters (arrays) - automatically encoded
+itemsPath({ tags: ['featured', 'new'] })
+// => "/items?tags%5B%5D=featured&tags%5B%5D=new"
+
+// Combining ID with query parameters
+itemPath(1, { tab: 'history', expanded: true })
+// => "/items/1?tab=history&expanded=true"
+
+// Objects with id property (automatically extracts ID)
+const item = { id: 42, name: "Widget" }
+itemPath(item)
+// => "/items/42"
+
+// Objects with to_param (uses to_param instead of id)
+const item = { id: 42, name: "Widget", to_param: "widget-42" }
+itemPath(item)
+// => "/items/widget-42"
+```
+
+**Common patterns:**
+
+```tsx
+// ✅ Programmatic navigation with query params
+router.get(itemsPath({ q: searchQuery, status: filter }))
+
+// ✅ Link with query params
+<Link href={itemsPath({ status: 'active' })}>Active Items</Link>
+
+// ✅ Combining everything
+itemPath(item.id, { format: 'json', anchor: 'details', debug: true })
+// => "/items/42.json?debug=true#details"
+
+// ❌ Don't manually construct URLs
+router.get(`/items?q=${searchQuery}`)  // Wrong!
+router.get(`${itemsPath()}?q=${searchQuery}`)  // Wrong!
+```
+
 ### Rendering Behavior
 
 **Always use explicit `render inertia:` calls** to avoid security risks from accidentally leaking sensitive data.
