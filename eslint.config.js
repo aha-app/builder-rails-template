@@ -3,6 +3,7 @@ import prettierConfig from "eslint-config-prettier/flat";
 import importPlugin from "eslint-plugin-import";
 import pluginReact from "eslint-plugin-react";
 import reactHooks from "eslint-plugin-react-hooks";
+import unusedImports from "eslint-plugin-unused-imports";
 import globals from "globals";
 import tseslint from "typescript-eslint";
 
@@ -34,6 +35,11 @@ export default [
   {
     ...importPlugin.flatConfigs.recommended,
     ...importPlugin.flatConfigs.typescript,
+    plugins: {
+      ...importPlugin.flatConfigs.recommended.plugins,
+      ...importPlugin.flatConfigs.typescript.plugins,
+      "unused-imports": unusedImports,
+    },
     rules: {
       "import/order": [
         "error",
@@ -53,6 +59,17 @@ export default [
       "import/first": "error",
       "import/extensions": ["error", "never"],
       "@typescript-eslint/consistent-type-imports": "error",
+      "@typescript-eslint/no-unused-vars": "off",
+      "unused-imports/no-unused-imports": "error",
+      "unused-imports/no-unused-vars": [
+        "warn",
+        {
+          vars: "all",
+          varsIgnorePattern: "^_",
+          args: "after-used",
+          argsIgnorePattern: "^_",
+        },
+      ],
     },
   },
   {
