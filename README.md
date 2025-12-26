@@ -45,6 +45,7 @@ Rails 8.1 + Inertia.js + React 19 + TypeScript + Vite. Uses shadcn/ui components
 ### Routing with JS-Routes
 
 **Always use js-routes helpers** - they provide type-safe, Rails-consistent routing with automatic parameter handling.
+**You never need to manually regenerate the routes file; it's auto-regenerated on editing `config/routes.rb`.**
 
 ```typescript
 import { itemsPath, itemPath, newItemPath } from "@/routes"
