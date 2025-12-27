@@ -92,8 +92,4 @@ Rails.application.configure do
 
   # Replace the default in-process and non-durable queuing backend for Active Job.
   config.active_job.queue_adapter = :solid_queue
-
-  # Silence SolidQueue heartbeat logs to reduce log noise
-  config.solid_queue.silence_heartbeats = true
-  config.solid_queue.silence_polling = true
 end
