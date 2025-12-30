@@ -9,31 +9,29 @@ module Authentication
   private
 
   def authenticate
-    if session[:session_token].present?
-      session_result = Aha::Auth.validate_session(
-        session[:session_token],
-        refresh_token: session[:refresh_token]
-      )
+    return unless session[:session_token].present?
 
-      if session_result.valid?
-        if session_result.refreshed?
-          session[:session_token] = session_result.new_session_token
-          session[:refresh_token] = session_result.new_refresh_token
-        end
+    session_result = Aha::Auth.validate_session(
+      session[:session_token],
+      refresh_token: session[:refresh_token]
+    )
 
-        @current_user = User.find_by(id: session[:user_id])
-        Current.user = @current_user
-      else
-        reset_session
-        redirect_to new_session_path, alert: "Your session has expired. Please log in again."
+    if session_result.valid?
+      if session_result.refreshed?
+        session[:session_token] = session_result.new_session_token
+        session[:refresh_token] = session_result.new_refresh_token
       end
+
+      @current_user = User.find_by(id: session[:user_id])
+      Current.user = @current_user
     else
-      redirect_to new_session_path
+      clear_session
+      redirect_to login_path, alert: "Your session has expired. Please log in again."
     end
   rescue Aha::Auth::ApiError => e
     Rails.logger.error "Session validation failed: #{e.message}"
-    reset_session
-    redirect_to new_session_path, alert: "Authentication error. Please log in again."
+    clear_session
+    redirect_to login_path, alert: "Authentication error. Please log in again."
   end
 
   def current_user
