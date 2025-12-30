@@ -1,8 +1,9 @@
 export interface Flash {
-  alert?: string;
-  notice?: string;
+  alert?: string
+  notice?: string
 }
 
 export interface SharedData {
-  flash: Flash;
+  flash: Flash
+  [key: string]: unknown
 }

@@ -69,7 +69,7 @@ class AhaAuthGenerator < Rails::Generators::Base
     return unless File.exist?(types_file)
 
     gsub_file types_file,
-      /export interface Flash \{\n  alert\?: string;\n  notice\?: string;\n\}\n\nexport interface SharedData \{\n  flash: Flash;\n\}/,
+      /export interface Flash \{\n  alert\?: string\n  notice\?: string\n\}\n\nexport interface SharedData \{\n  flash: Flash\n  \[key: string\]: unknown\n\}/,
       <<~TYPESCRIPT.chomp
         export interface Flash {
           alert?: string
@@ -88,6 +88,7 @@ class AhaAuthGenerator < Rails::Generators::Base
           auth: {
             user: AuthUser | null
           }
+          [key: string]: unknown
         }
       TYPESCRIPT
   end
