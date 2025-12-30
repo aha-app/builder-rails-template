@@ -1,0 +1,59 @@
+module Authentication
+  extend ActiveSupport::Concern
+
+  included do
+    before_action :authenticate
+    helper_method :current_user, :logged_in?
+  end
+
+  private
+
+  def authenticate
+    if session[:session_token].present?
+      session_result = Aha::Auth.validate_session(
+        session[:session_token],
+        refresh_token: session[:refresh_token]
+      )
+
+      if session_result.valid?
+        if session_result.refreshed?
+          session[:session_token] = session_result.new_session_token
+          session[:refresh_token] = session_result.new_refresh_token
+        end
+
+        @current_user = User.find_by(id: session[:user_id])
+        Current.user = @current_user
+      else
+        reset_session
+        redirect_to new_session_path, alert: "Your session has expired. Please log in again."
+      end
+    else
+      redirect_to new_session_path
+    end
+  rescue Aha::Auth::ApiError => e
+    Rails.logger.error "Session validation failed: #{e.message}"
+    reset_session
+    redirect_to new_session_path, alert: "Authentication error. Please log in again."
+  end
+
+  def current_user
+    @current_user ||= Current.user
+  end
+
+  def logged_in?
+    current_user.present?
+  end
+
+  def require_authentication
+    return if logged_in?
+
+    redirect_to login_path(return_to: request.fullpath), alert: "You must be logged in to access this page."
+  end
+
+  def clear_session
+    session.delete(:session_token)
+    session.delete(:refresh_token)
+    session.delete(:user_id)
+    @current_user = nil
+  end
+end
