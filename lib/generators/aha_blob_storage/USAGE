@@ -1,0 +1,19 @@
+Description:
+    Configures Active Storage to use Aha blob storage service.
+
+    This generator sets up S3-compatible blob storage for file uploads
+    using environment variables provided by the container orchestrator.
+
+Example:
+    bin/rails generate aha_blob_storage
+
+    This will:
+    - Run active_storage:install to create required migrations
+    - Add aws-sdk-s3 gem to Gemfile
+    - Update config/storage.yml with blob storage configuration
+    - Set config.active_storage.service = :blob in development.rb
+    - Set config.active_storage.service = :blob in production.rb
+
+Prerequisites:
+    The container must have blob storage attached via the SetupBlobStorageTool
+    which sets the required BLOB_UPLOADS_S3_* environment variables.
