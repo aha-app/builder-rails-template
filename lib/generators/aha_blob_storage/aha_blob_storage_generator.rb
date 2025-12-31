@@ -6,7 +6,7 @@ class AhaBlobStorageGenerator < Rails::Generators::Base
   source_root File.expand_path("templates", __dir__)
 
   def install_active_storage
-    generate "active_storage:install"
+    run "bin/rails active_storage:install"
   end
 
   def add_aws_sdk_gem
@@ -27,10 +27,6 @@ class AhaBlobStorageGenerator < Rails::Generators::Base
     gsub_file "config/environments/production.rb",
       /config\.active_storage\.service\s*=\s*:\w+/,
       "config.active_storage.service = :blob"
-  end
-
-  def bundle_install
-    run "bundle install"
   end
 
   def display_instructions
