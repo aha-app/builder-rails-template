@@ -94,13 +94,12 @@ class AhaAuthGenerator < Rails::Generators::Base
   end
 
   def generate_js_routes
+    say "\nRegenerating js-routes file...", :green
     rails_command "js:routes"
   end
 
   def display_instructions
     say "\nAha Auth setup complete!", :green
-    say "\nNext step:"
-    say "  rails db:migrate"
   end
 
   private

@@ -31,8 +31,6 @@ class AhaBlobStorageGenerator < Rails::Generators::Base
 
   def display_instructions
     say "\nBlob storage configured!", :green
-    say "\nNext step:"
-    say "  rails db:migrate"
   end
 
   private
