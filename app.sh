@@ -4,6 +4,8 @@ set -e
 export NODE_ENV=development
 export RAILS_ENV=development
 
+bin/rails db:migrate
+
 echo "Starting processes (Rails, Vite)"
 
 # Start Vite dev server in the background
