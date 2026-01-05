@@ -24,14 +24,14 @@ const appName = import.meta.env.VITE_APP_NAME ?? "Builder"
 createInertiaApp({
   title: (title) => (title ? `${title} - ${appName}` : appName),
 
-  resolve: (name) => {
-    const pages = import.meta.glob<ResolvedComponent>("../pages/**/*.tsx", {
-      eager: true,
-    })
-    const page = pages[`../pages/${name}.tsx`]
-    if (!page) {
+  resolve: async (name) => {
+    const pages = import.meta.glob<ResolvedComponent>("../pages/**/*.tsx")
+    const importPage = pages[`../pages/${name}.tsx`]
+    if (!importPage) {
       throw new Error(`Missing Inertia page component: '${name}.tsx'`)
     }
+
+    const page = await importPage()
 
     page.default.layout ??= (pageContent: ReactNode) =>
       createElement(PersistentLayout, null, pageContent)
