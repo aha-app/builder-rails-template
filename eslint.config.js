@@ -59,6 +59,7 @@ export default [
       "import/first": "error",
       "import/extensions": ["error", "never"],
       "@typescript-eslint/consistent-type-imports": "error",
+      "@typescript-eslint/prefer-nullish-coalescing": "off",
       "@typescript-eslint/no-unused-vars": "off",
       "unused-imports/no-unused-imports": "error",
       "unused-imports/no-unused-vars": [
