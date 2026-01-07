@@ -1,8 +1,0 @@
-class User < ApplicationRecord
-  validates :auth_identifier, presence: true, uniqueness: true
-  validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
-
-  def name
-    "#{first_name} #{last_name}".strip.presence || email
-  end
-end
