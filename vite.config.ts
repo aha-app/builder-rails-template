@@ -4,8 +4,11 @@ import { defineConfig } from "vite"
 import EnvironmentPlugin from "vite-plugin-environment"
 import ViteRuby from "vite-plugin-ruby"
 
+import { ahaBuilderIdsPlugin } from "./vite-plugin-aha-builder-ids"
+
 export default defineConfig({
   plugins: [
+    ahaBuilderIdsPlugin(),
     react({
       babel: {
         plugins: ["babel-plugin-react-compiler"],
