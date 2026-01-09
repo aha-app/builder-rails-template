@@ -19,7 +19,9 @@ export default defineConfig({
     EnvironmentPlugin({ RAILS_ENV: "development" }),
   ],
   server: {
-    hmr: false,
+    hmr: {
+      clientPort: parseInt(process.env.HMR_PROXY_PORT || "3000"),
+    },
   },
   logLevel: "error",
   build: {
