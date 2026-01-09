@@ -11,6 +11,7 @@ Rails 8.1 + Inertia.js + React 19 + TypeScript + Vite. Uses shadcn/ui components
 - Early development, no users. No backwards compatibility concerns. Do things RIGHT: clean, organized, zero tech debt. Never create compatibility shims.
 - WE NEVER WANT WORKAROUNDS, we always want FULL implementations that are long term sustainable for many >1000 users. so dont come up with half baked solutions
 - We want thin controllers, fat models/services. All business logic in models/services with unit tests. No controller/integration tests.
+- We are using postgres for development and production and sqlite for the test environment. This means that things like jsonb columns will break the test environment. So avoid using jsonb columns or other postgres-specific features unless absolutely necessary.
 
 ## Frontend Structure
 
