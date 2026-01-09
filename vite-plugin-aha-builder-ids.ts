@@ -62,11 +62,11 @@ export function ahaBuilderIdsPlugin(): Plugin {
         let sourceFile: string
         const appFrontendIndex = cleanId.indexOf("/app/frontend/")
         if (appFrontendIndex !== -1) {
-          sourceFile = cleanId.slice(appFrontendIndex + 1).replace(/\.[jt]sx$/, "")
+          sourceFile = cleanId.slice(appFrontendIndex + 1)
         } else if (cleanId.startsWith(root)) {
-          sourceFile = "app/frontend/" + path.relative(root, cleanId).replace(/\.[jt]sx$/, "")
+          sourceFile = "app/frontend/" + path.relative(root, cleanId)
         } else {
-          sourceFile = "app/frontend/" + path.basename(cleanId).replace(/\.[jt]sx$/, "")
+          sourceFile = "app/frontend/" + path.basename(cleanId)
         }
 
         traverse(ast, {
