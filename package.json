@@ -88,10 +88,10 @@
     "zod": "^4.1.12"
   },
   "scripts": {
-    "typecheck": "sc -p tsconfig.app.json && tsc -p tsconfig.node.json",
+    "typecheck": "tsc -p tsconfig.app.json && tsc -p tsconfig.node.json",
     "type-check": "npm run typecheck",
     "lint": "eslint '*.{js,mjs,cjs,ts}' app/frontend --report-unused-disable-directives --max-warnings 0",
-    "lint:fix": "pm run lint -- --fix",
+    "lint:fix": "npm run lint -- --fix",
     "format": "prettier --check 'app/frontend' '*.{js,mjs,cjs,ts}'",
     "format:fix": "npm run format -- --write",
     "test": "DEBUG_PRINT_LIMIT=0 COLORS=false NO_COLOR=true vitest run --reporter=dot --passWithNoTests"
