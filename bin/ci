@@ -3,6 +3,7 @@ set -e
 export CI=true
 export NO_COLOR=1
 export RAILS_ENV=test
+export COLORS=false
 bin/rails test --no-color
 bundle exec rubocop -A --no-color
 npm run lint:fix
