@@ -59,7 +59,7 @@ class ViteWebsocketProxy
 
   def stream(from, to)
     IO.copy_stream(from, to)
-  rescue IOError, Errno::ECONNRESET, Errno::EPIPE
+  rescue IOError, Errno::ECONNRESET, Errno::EPIPE, Errno::EBADF
     # closed
   ensure
     from.close rescue nil
