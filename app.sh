@@ -9,7 +9,7 @@ bin/rails db:migrate
 echo "Starting processes (Rails, Vite)"
 
 # Start Vite dev server in the background
-HMR_PROXY_PORT=30787 bin/vite dev &
+bin/vite dev &
 VITE_PID=$!
 
 # Trap to kill background processes on exit

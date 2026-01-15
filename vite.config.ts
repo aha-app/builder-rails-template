@@ -20,7 +20,7 @@ export default defineConfig({
   ],
   server: {
     hmr: {
-      clientPort: parseInt(process.env.HMR_PROXY_PORT || "3000"),
+      clientPort: parseInt(process.env.HMR_PROXY_PORT || "443"),
     },
   },
   logLevel: "error",
