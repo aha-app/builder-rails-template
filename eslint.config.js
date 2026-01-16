@@ -7,6 +7,9 @@ import unusedImports from "eslint-plugin-unused-imports";
 import globals from "globals";
 import tseslint from "typescript-eslint";
 
+// eslint-disable-next-line import/extensions
+import inertiaLocal from "./eslint-local-rules/index.js";
+
 /** @type {import('eslint').Linter.Config[]} */
 export default [
   { files: ["app/frontend/**/*.{js,mjs,cjs,ts,jsx,tsx}"] },
@@ -39,6 +42,7 @@ export default [
       ...importPlugin.flatConfigs.recommended.plugins,
       ...importPlugin.flatConfigs.typescript.plugins,
       "unused-imports": unusedImports,
+      inertia: inertiaLocal,
     },
     rules: {
       "import/order": [
@@ -71,6 +75,12 @@ export default [
           argsIgnorePattern: "^_",
         },
       ],
+      "inertia/no-manual-url-construction": "error",
+      "inertia/no-field-input-import": "error",
+      "inertia/no-min-h-screen-in-pages": "error",
+      "inertia/no-tailwind-container": "error",
+      "inertia/use-anchor-for-auth-routes": "error",
+      "inertia/no-empty-select-item-value": "error",
     },
   },
   {

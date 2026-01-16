@@ -1,2 +1,28 @@
 # Omakase Ruby styling for Rails
 inherit_gem: { rubocop-rails-omakase: rubocop.yml }
+
+require:
+  - ./lib/rubocop/cop/inertia/no_head_response.rb
+  - ./lib/rubocop/cop/inertia/explicit_inertia_render.rb
+  - ./lib/rubocop/cop/inertia/as_json_requires_only.rb
+  - ./lib/rubocop/cop/inertia/use_inertia_errors.rb
+
+Inertia/NoHeadResponse:
+  Enabled: true
+  Include:
+    - 'app/controllers/**/*.rb'
+
+Inertia/ExplicitInertiaRender:
+  Enabled: true
+  Include:
+    - 'app/controllers/**/*.rb'
+
+Inertia/AsJsonRequiresOnly:
+  Enabled: true
+  Include:
+    - 'app/controllers/**/*.rb'
+
+Inertia/UseInertiaErrors:
+  Enabled: true
+  Include:
+    - 'app/controllers/**/*.rb'
