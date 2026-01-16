@@ -86,7 +86,7 @@ GEM
       activesupport (>= 6.0.0)
     ast (2.4.3)
     base64 (0.3.0)
-    bcrypt (3.1.20)
+    bcrypt (3.1.21)
     bigdecimal (4.0.1)
     bindex (0.8.1)
     bootsnap (1.19.0)
@@ -376,9 +376,9 @@ PLATFORMS
   x86_64-linux-musl
 
 DEPENDENCIES
-  aha_builder_core (~> 1.0.15)
+  aha_builder_core (~> 1.0.13)
   annotaterb
-  bcrypt (~> 3.1.7)
+  bcrypt (~> 3.1.21)
   bootsnap
   brakeman
   bundler-audit

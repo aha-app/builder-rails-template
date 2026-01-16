@@ -5,7 +5,7 @@ gem "propshaft"
 gem "pg", "~> 1.1"
 gem "puma", ">= 5.0"
 gem "jbuilder"
-gem "bcrypt", "~> 3.1.7"
+gem "bcrypt", "~> 3.1.21"
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 gem "solid_cache"
 gem "solid_queue"
