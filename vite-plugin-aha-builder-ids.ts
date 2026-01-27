@@ -91,7 +91,7 @@ export function ahaBuilderIdsPlugin(): Plugin {
               (attr: t.JSXAttribute | t.JSXSpreadAttribute) =>
                 t.isJSXAttribute(attr) &&
                 t.isJSXIdentifier(attr.name) &&
-                attr.name.name === "data-aha-builder-id",
+                attr.name.name === "data-aha-ai-source",
             )
 
             if (hasId) return
@@ -110,10 +110,35 @@ export function ahaBuilderIdsPlugin(): Plugin {
 
             openingElement.attributes.push(
               t.jsxAttribute(
-                t.jsxIdentifier("data-aha-builder-id"),
+                t.jsxIdentifier("data-aha-ai-source"),
                 t.stringLiteral(builderId),
               ),
             )
+
+            // Check if element has any dynamic text content (JSX expression in children)
+            const hasDynamicText = nodePath.node.children.some(
+              (child) =>
+                t.isJSXExpressionContainer(child) &&
+                !t.isJSXEmptyExpression(child.expression),
+            )
+
+            if (hasDynamicText) {
+              const hasAttr = openingElement.attributes.some(
+                (attr: t.JSXAttribute | t.JSXSpreadAttribute) =>
+                  t.isJSXAttribute(attr) &&
+                  t.isJSXIdentifier(attr.name) &&
+                  attr.name.name === "data-aha-dynamic-text",
+              )
+
+              if (!hasAttr) {
+                openingElement.attributes.push(
+                  t.jsxAttribute(
+                    t.jsxIdentifier("data-aha-dynamic-text"),
+                    t.stringLiteral("true"),
+                  ),
+                )
+              }
+            }
 
             hasChanges = true
             addedCount++
