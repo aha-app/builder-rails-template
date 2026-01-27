@@ -1,3 +1,7 @@
-<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="256" cy="256" r="256" fill="red"/>
+<svg width="92" height="92" viewBox="0 0 92 92" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="8.29732" cy="8.29732" r="8.29732" transform="matrix(1 0 0 -1 36.9004 54.5029)" fill="#0073CF"/>
+<rect width="16.5946" height="63.181" rx="8.29732" transform="matrix(0.707107 -0.707107 -0.707107 -0.707107 45.0981 91.3798)" fill="#002D56"/>
+<rect width="16.5946" height="44.7209" rx="8.29732" transform="matrix(0.707107 0.707107 0.707107 -0.707107 47.1841 65.8256)" fill="#0073CF"/>
+<rect width="16.5946" height="64.1076" rx="8.29732" transform="matrix(-0.707107 0.707107 0.707107 0.707107 45.8916 0)" fill="#0073CF"/>
+<rect width="16.5946" height="44.4786" rx="8.29732" transform="matrix(-0.707107 -0.707107 -0.707107 0.707107 43.1851 26.5765)" fill="#002D56"/>
 </svg>
