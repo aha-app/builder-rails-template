@@ -145,7 +145,8 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground font-sans;
+    @apply bg-background text-foreground;
+    font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
@@ -155,11 +156,5 @@
     font-feature-settings:
       "liga" 1,
       "calt" 1; /* fix for Chrome */
-  }
-
-  @supports (font-variation-settings: normal) {
-    :root {
-      font-family: InterVariable, sans-serif;
-    }
   }
 }
