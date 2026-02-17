@@ -22,8 +22,8 @@ Rails.application.configure do
   config.action_controller.forgery_protection_origin_check = false
 
   config.hosts << ".ahalocalhost.com"
-  config.hosts << /fredcodes-local-[a-z0-9]+/
-  config.hosts << /.+\.fredcodes-prod\.aha-.+\.com/
+  config.hosts << /.+\.fredcodes-prod\.aha-[0-9]+\.com/
+  config.hosts << /.+\.\.aha\.host/
 
 
   # Enable/disable Action Controller caching. By default Action Controller caching is disabled.
