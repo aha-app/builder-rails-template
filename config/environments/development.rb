@@ -23,7 +23,7 @@ Rails.application.configure do
 
   config.hosts << ".ahalocalhost.com"
   config.hosts << /.+\.fredcodes-prod\.aha-[0-9]+\.com/
-  config.hosts << /.+\.\.aha\.host/
+  config.hosts << ".aha.host"
 
 
   # Enable/disable Action Controller caching. By default Action Controller caching is disabled.
