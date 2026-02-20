@@ -113,8 +113,6 @@ router.get(`${itemsPath()}?q=${searchQuery}`)  // Wrong!
 
 ### Page Titles
 
-**ALWAYS set the base title for the app** by updating `baseTitle` in app/frontend/entrypoints/inertia.tsx
-
 **Every page MUST have a descriptive browser tab title.** Use Inertia's `<Head>` component to set titles on each page.
 
 #### Page Component Pattern
@@ -135,6 +133,13 @@ export default function ProjectShow({ project }: { project: Project }) {
   );
 }
 ```
+
+#### Base title
+
+To change the base title, update
+
+- `baseTitle` value in app/frontend/entrypoints/inertia.tsx
+- `<title>` contents in app/views/layouts/application.html.erb
 
 #### Navigation Requirement
 
