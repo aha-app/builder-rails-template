@@ -111,6 +111,33 @@ router.get(`/items?q=${searchQuery}`)  // Wrong!
 router.get(`${itemsPath()}?q=${searchQuery}`)  // Wrong!
 ```
 
+### Page Titles
+
+**Every page MUST have a descriptive browser tab title.** Use Inertia's `<Head>` component to set titles on each page.
+
+#### Page Component Pattern
+
+```tsx
+import { Head } from '@inertiajs/react';
+
+interface Props {
+  projects: Project[];
+}
+
+export default function ProjectShow({ project }: { project: Project }) {
+  return (
+    <>
+      <Head title={project.name} />
+      {/* page content */}
+    </>
+  );
+}
+```
+
+#### Navigation Requirement
+
+Use Inertia `<Link>` (not `<a>` tags) for all in-app navigation so page transitions are client-side and titles update correctly.
+
 ### Rendering Behavior
 
 **Always use explicit `render inertia:` calls** to avoid security risks from accidentally leaking sensitive data.
