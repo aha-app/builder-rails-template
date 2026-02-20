@@ -19,10 +19,10 @@ interface ResolvedComponent {
   default: PageComponent
 }
 
-const appName = import.meta.env.VITE_APP_NAME ?? "Builder"
+const baseTitle = 'Builder application'
 
 createInertiaApp({
-  title: (title) => (title ? `${title} - ${appName}` : appName),
+  title: (title) => (title ? `${title} - ${baseTitle}` : baseTitle),
 
   resolve: async (name) => {
     const pages = import.meta.glob<ResolvedComponent>("../pages/**/*.tsx")
