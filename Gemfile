@@ -19,7 +19,7 @@ gem "aha_builder_core", "~> 1.0.20"
 
 group :development, :test do
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
-  gem "brakeman", "~> 8.0.2", require: false
+  gem "brakeman", "~> 8.0.3", require: false
   gem "bundler-audit", require: false
   gem "rubocop-rails-omakase", require: false
 end
