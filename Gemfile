@@ -12,7 +12,7 @@ gem "solid_queue", "~> 1.3.0"
 gem "solid_cable"
 gem "bootsnap", require: false
 gem "image_processing", "~> 1.2"
-gem "inertia_rails", "~> 3.16"
+gem "inertia_rails", "~> 3.18"
 gem "vite_rails", "~> 3.0.20"
 gem "js-routes"
 gem "aha_builder_core", "~> 1.0.20"
