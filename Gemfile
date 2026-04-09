@@ -8,7 +8,7 @@ gem "jbuilder"
 gem "bcrypt", "~> 3.1.21"
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 gem "solid_cache"
-gem "solid_queue", "~> 1.3.0"
+gem "solid_queue", "~> 1.3.2"
 gem "solid_cable"
 gem "bootsnap", require: false
 gem "image_processing", "~> 1.2"
